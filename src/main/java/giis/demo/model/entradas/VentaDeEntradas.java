@@ -244,16 +244,28 @@ public class VentaDeEntradas extends Venta{
 	        int fila, int asiento) throws SinDisponibilidadException {
 
 	    this.idPartido = partido.getId_partido();
-
-	    Butaca butaca = new Butaca(idPartido, tribuna, seccion, fila, asiento);
-
-	    if (!butacasDisponibles.contains(butaca)) {
-	        throw new SinDisponibilidadException("El asiento seleccionado no está disponible");
+	    
+	    Butaca butacaSeleccionada = null;
+	    
+	    for(Butaca butaca : butacasDisponibles) {
+	    	
+	    	if(butaca.getFila() == fila && butaca.getAsiento()==asiento) {
+	    		
+	    		butacaSeleccionada = butaca;
+	    		break;
+	    		
+	    	}
+	    	
+	    }
+	    
+	    if (butacaSeleccionada == null) {
+	        throw new SinDisponibilidadException(
+	                "El asiento seleccionado no está disponible");
 	    }
 
-	    butacasSeleccionadas = new ArrayList<Butaca>();
-	    butacasSeleccionadas.add(butaca);
-
+	    butacasSeleccionadas = new ArrayList<>();
+	    butacasSeleccionadas.add(butacaSeleccionada);
+	    
 	}
 	
 	/**

@@ -7,8 +7,7 @@ import java.sql.SQLException;
 
 public class PrecioSeccionJdbc {
 
-	private static final String QUERY_OBTENER_PRECIO = "SELECT precio FROM PrecioSeccion "
-			+ "WHERE id_partido = ? AND seccion = ";
+	private static final String QUERY_PRECIO = "SELECT precio FROM PrecioSeccion WHERE id_partido = ? AND seccion = ?";
 
 	/**
 	 * Obtiene el precio de un asiento para un partido y una seccion dadas
@@ -18,28 +17,20 @@ public class PrecioSeccionJdbc {
 	 */
 	public static double getPrecio(Connection con, int idPartido, String seccion) throws SQLException {
 
-		try (PreparedStatement ps = con.prepareStatement(QUERY_OBTENER_PRECIO)) {
+		try (PreparedStatement ps = con.prepareStatement(QUERY_PRECIO)) {
 
 			ps.setInt(1, idPartido);
 			ps.setString(2, seccion);
 
 			try (ResultSet rs = ps.executeQuery()) {
 
-				while (rs.next()) {
-
-					if (rs.next()) {
-
-						return rs.getDouble("precio");
-
-					}
-
+				if (rs.next()) {
+					return rs.getDouble("precio");
 				}
-
 			}
-
-			throw new SQLException("No hay precio definido para el partido " + idPartido + " y la sección " + seccion);
-
 		}
+
+		throw new SQLException("No hay precio definido para el partido " + idPartido + " y la sección " + seccion);
 
 	}
 }

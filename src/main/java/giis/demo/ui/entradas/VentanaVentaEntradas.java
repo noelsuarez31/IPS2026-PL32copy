@@ -255,7 +255,7 @@ public class VentanaVentaEntradas extends JFrame {
 			lbNumEntradas = new JLabel("Número de asientos:");
 			lbNumEntradas.setLabelFor(getSpNumEntradas());
 			lbNumEntradas.setBounds(22, 50, 152, 30);
-			lbNumEntradas.setDisplayedMnemonic('E');
+			lbNumEntradas.setDisplayedMnemonic('N');
 		}
 
 		return lbNumEntradas;
@@ -573,7 +573,13 @@ public class VentanaVentaEntradas extends JFrame {
 
 		if (tablaAsientos == null) {
 
-			tablaAsientos = new JTable(10, 15);
+			tablaAsientos = new JTable(10, 15){
+			    @Override
+			    public boolean isCellEditable(int row, int column) {
+			        return false;
+			    }
+			};
+		
 			tablaAsientos.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -614,7 +620,7 @@ public class VentanaVentaEntradas extends JFrame {
 						boolean hasFocus, int row, int column) {
 
 					Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-					c.setBackground(Color.GREEN);
+					c.setBackground(new Color(128,255,128));
 
 					try {
 
@@ -622,13 +628,13 @@ public class VentanaVentaEntradas extends JFrame {
 								((TipoTribuna) getCbTribuna().getSelectedItem()),
 								((TipoSeccion) getCbSeccion().getSelectedItem()), row + 1, column + 1)) {
 
-							c.setBackground(Color.RED);
+							c.setBackground(new Color(255,128,128));
 
 						} else if (venta.isBooked(((Partido) getCbPartido().getSelectedItem()).getId_partido(),
 								((TipoTribuna) getCbTribuna().getSelectedItem()),
 								((TipoSeccion) getCbSeccion().getSelectedItem()), row + 1, column + 1)) {
 
-							c.setBackground(Color.BLUE);
+							c.setBackground(new Color(0,128,255));
 
 						}
 
@@ -644,6 +650,7 @@ public class VentanaVentaEntradas extends JFrame {
 			});
 
 		}
+	
 		return tablaAsientos;
 
 	}
@@ -668,7 +675,7 @@ public class VentanaVentaEntradas extends JFrame {
 	private JButton getBtVerde() {
 		if (btVerde == null) {
 			btVerde = new JButton("");
-			btVerde.setBackground(Color.GREEN);
+			btVerde.setBackground(new Color(128,255,128));
 		}
 		return btVerde;
 	}
@@ -940,7 +947,7 @@ public class VentanaVentaEntradas extends JFrame {
 	private JButton getBtRojo() {
 		if (btRojo == null) {
 			btRojo = new JButton("");
-			btRojo.setBackground(Color.RED);
+			btRojo.setBackground(new Color(255,128,128));
 		}
 		return btRojo;
 	}
@@ -948,7 +955,7 @@ public class VentanaVentaEntradas extends JFrame {
 	private JButton getBtAzul() {
 		if (btAzul == null) {
 			btAzul = new JButton("");
-			btAzul.setBackground(Color.BLUE);
+			btAzul.setBackground(new Color(0,128,255));
 		}
 		return btAzul;
 	}
@@ -957,7 +964,7 @@ public class VentanaVentaEntradas extends JFrame {
 		if (lbEmail == null) {
 			lbEmail = new JLabel("Email:");
 			lbEmail.setDisplayedMnemonic('E');
-			lbEmail.setBounds(0, 0, 152, 30);
+			lbEmail.setBounds(22, 130, 152, 30);
 		}
 		return lbEmail;
 	}

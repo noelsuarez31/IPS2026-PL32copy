@@ -5,6 +5,21 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -16,6 +31,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -25,32 +42,15 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import com.toedter.calendar.JDateChooser;
 
+import giis.demo.exceptions.AbonoNoPermitidoException;
+import giis.demo.model.abonos.Abonado;
+import giis.demo.model.abonos.Abono;
+import giis.demo.model.abonos.Abono.Categoria;
+import giis.demo.model.abonos.VentaDeAbonos;
 import giis.demo.model.entradas.enumerados.TipoSeccion;
 import giis.demo.model.entradas.enumerados.TipoTribuna;
 import giis.demo.model.equipo.Equipo;
 import giis.demo.ui.VentanaPrincipal;
-import giis.demo.exceptions.AbonoNoPermitidoException;
-import giis.demo.model.abonos.Abonado;
-import giis.demo.model.abonos.Abono;
-import giis.demo.model.abonos.VentaDeAbonos;
-import giis.demo.model.abonos.Abono.Categoria;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.awt.event.ActionEvent;
-import javax.swing.SpinnerNumberModel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 /**
  * Create the frame.
@@ -599,6 +599,7 @@ public class VentanaAbono extends JFrame {
 			Abono abono = obtenerDatosAbono(equipo, fechaNacimiento);
 
 			va.venderAbono(abonado, abono, equipo.getIdEquipo());
+			enviarEmail(getTfEmail().getText().trim(), construirCuerpoEmail(abonado, abono, equipo));
 
 			JOptionPane.showMessageDialog(null,
 					"Abono vendido correctamente.\n" + "Abonado: " + abonado.getNombre() + " " + abonado.getApellidos()
@@ -618,6 +619,46 @@ public class VentanaAbono extends JFrame {
 
 		}
 
+	}
+	
+	private String construirCuerpoEmail(Abonado abonado, Abono abono, Equipo equipo) {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Hola ").append(abonado.getNombre()).append(" ").append(abonado.getApellidos()).append(",\n\n");
+		sb.append("Gracias por abonarte. Estos son los datos de tu abono:\n\n");
+		sb.append("Equipo: ").append(equipo.getNombre()).append("\n");
+		sb.append("Tribuna: ").append(getCbTribuna().getSelectedItem()).append("\n");
+		sb.append("Sección: ").append(getCbSeccion().getSelectedItem()).append("\n");
+		sb.append("Fila ").append(abono.getFila()).append(", asiento ").append(abono.getAsiento()).append("\n");
+		sb.append("Categoría: ").append(abono.getCategoria()).append("\n");
+		sb.append("Precio: ").append(abono.getPrecio()).append(" €\n");
+
+		return sb.toString();
+	}
+
+	private void enviarEmail(final String destinatario, final String cuerpo) {
+
+		new SwingWorker<Void, Void>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				new ServicioEmail().enviar(destinatario, "Confirmación de abono de temporada", cuerpo);
+				return null;
+			}
+
+			@Override
+			protected void done() {
+				try {
+					get();
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(VentanaAbono.this,
+							"El abono se ha vendido, pero no se ha podido enviar el email de confirmación.",
+							"Aviso", JOptionPane.WARNING_MESSAGE);
+					System.err.println("Error al enviar el email: " + e.getMessage());
+				}
+			}
+		}.execute();
 	}
 
 	private Abonado obtenerDatosAbonado() {
@@ -929,9 +970,11 @@ public class VentanaAbono extends JFrame {
 
 		String correo = getTfEmail().getText();
 
-		if (!correo.matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")) {
+		if (!ValidadorEmail.esValido(correo)) {
 			
 			JOptionPane.showMessageDialog(null, "El formato del email debe ser xxxx@xx.xxx");
+			
+			getTfEmail().requestFocus();
 			return false;
 		}
 		

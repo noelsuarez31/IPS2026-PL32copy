@@ -25,6 +25,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingWorker;
 import javax.swing.JButton;
 
 import java.sql.SQLException;
@@ -540,13 +541,60 @@ public class VentanaVentaEntradas extends JFrame {
 	 */
 	private void mostrarConfirmacionReserva() throws SQLException {
 
+		final String email = getTfEmail().getText().trim();
+		final String cuerpo = construirCuerpoEmail();
+		
 		venta.almacenar(venta.getIdPartido(), venta.getButacasSeleccionadas());
 
+		enviarEmail(email, cuerpo);
+		
 		VentanaVentaConfirmacion vvc = new VentanaVentaConfirmacion(this);
-
 		vvc.setVisible(true);
 	}
+	
+	private String construirCuerpoEmail() {
 
+		Partido partido = (Partido) cbPartido.getSelectedItem();
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Gracias por su compra.\n\n");
+		sb.append("Partido: ").append(partido).append("\n");
+		sb.append("Tribuna: ").append(cbTribuna.getSelectedItem()).append("\n");
+		sb.append("Sección: ").append(cbSeccion.getSelectedItem()).append("\n");
+
+		for (Butaca b : venta.getButacasSeleccionadas()) {
+			sb.append("Fila ").append(b.getFila()).append(", asiento ").append(b.getAsiento()).append("\n");
+		}
+
+		sb.append("\nTotal: ").append(tfPrecio.getText()).append("\n");
+
+		return sb.toString();
+	}
+	
+	private void enviarEmail(final String destinatario, final String cuerpo) {
+
+		new SwingWorker<Void, Void>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				new ServicioEmail().enviar(destinatario, "Confirmación de compra de entradas", cuerpo);
+				return null;
+			}
+
+			@Override
+			protected void done() {
+				try {
+					get();
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(VentanaVentaEntradas.this,
+							"La compra se ha realizado, pero no se ha podido enviar el email de confirmación.",
+							"Aviso", JOptionPane.WARNING_MESSAGE);
+					System.err.println("Error al enviar el email: " + e.getMessage());
+				}
+			}
+		}.execute();
+	}
+	
 	/**
 	 * Método para volver al menú principal.
 	 * 
@@ -842,9 +890,7 @@ public class VentanaVentaEntradas extends JFrame {
 
 	private boolean comprobarEmail() {
 
-		String email = getTfEmail().getText().trim();
-
-		if (!email.matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")) {
+		if (!ValidadorEmail.esValido(getTfEmail().getText())) {
 
 			JOptionPane.showMessageDialog(this, "El formato del email debe ser xxxx@xx.xxx", "Email no válido",
 					JOptionPane.WARNING_MESSAGE);

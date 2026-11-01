@@ -21,6 +21,7 @@ import giis.demo.jdbc.equipo.EquipoJdbc;
 import giis.demo.jdbc.historial.HistorialJdbc;
 import giis.demo.jdbc.horarios.HorarioEspecificoJdbc;
 import giis.demo.jdbc.horarios.HorarioPeriodicoJdbc;
+import giis.demo.jdbc.mantenimiento.TareaMantenimientoJdbc;
 import giis.demo.jdbc.reservas.ComprobarDisponibilidadJdbc;
 import giis.demo.jdbc.reservas.InstalacionJdbc;
 import giis.demo.jdbc.reservas.ReservaJdbc;
@@ -41,6 +42,7 @@ import giis.demo.model.historial.Ingreso;
 import giis.demo.model.historial.LineaDetalle;
 import giis.demo.model.horarios.HorarioEspecifico;
 import giis.demo.model.horarios.HorarioPeriodico;
+import giis.demo.model.mantenimiento.TareaMantenimiento;
 import giis.demo.model.reserva.Instalacion;
 import giis.demo.model.reserva.Intervalo;
 import giis.demo.model.reserva.Reserva;
@@ -580,6 +582,35 @@ public class JDBC {
 		} finally {
 			con.setAutoCommit(autoCommitOriginal);
 		}
+	}
+	
+	/**
+	 * Devuelve la lista de empleados que tienen puesto de JARDINERIA
+	 */
+	public List<EmpleadoNoDeportivo> getJardineros() throws SQLException {
+		return TareaMantenimientoJdbc.getJardineros(con);
+	}
+
+	/**
+	 * Comprueba si un jardinero tiene otra tarea de mantenimiento solapada en esa fecha y horario
+	 */
+	public boolean tieneTareaSolapadaJardinero(String dniJardinero, String fecha, String horaInicio, String horaFin)
+			throws SQLException {
+		return TareaMantenimientoJdbc.tieneTareaSolapada(con, dniJardinero, fecha, horaInicio, horaFin);
+	}
+
+	/**
+	 * Registra una tarea de mantenimiento y vincula a los jardineros asignados de forma transaccional
+	 */
+	public void registrarTareaMantenimiento(TareaMantenimiento tarea, List<String> dnisJardineros) throws SQLException {
+		TareaMantenimientoJdbc.registrarTareaMantenimiento(con, tarea, dnisJardineros);
+	}
+
+	/**
+	 * Obtiene las tareas de mantenimiento de una instalación en una fecha determinada
+	 */
+	public List<TareaMantenimiento> getTareasInstalacionFecha(int idInstalacion, String fecha) throws SQLException {
+		return TareaMantenimientoJdbc.getTareasInstalacionFecha(con, idInstalacion, fecha);
 	}
 	
 }

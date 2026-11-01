@@ -32,7 +32,6 @@ import giis.demo.model.contrataciones.GestorEmpleados;
 import giis.demo.model.empleado.BaseEmpleado;
 import giis.demo.model.empleado.EmpleadoDeportivo;
 import giis.demo.ui.VentanaPrincipal;
-import giis.demo.ui.contrataciones.VentanaAltaEmpleado;
 
 /**
  * Permite elegir un empleado existente, modificar sus datos personales y su salario

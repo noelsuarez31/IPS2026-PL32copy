@@ -1,7 +1,11 @@
 package giis.demo.ui.horarios;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -14,9 +18,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JCalendar;
@@ -59,31 +65,58 @@ public class VentanaHorarioSemanal extends JFrame {
 		this.ghs = vp.getGestionHorarioSemanal();
 
 		setTitle("Consultar Horarios Semanales - Empleados No Deportivos");
-		setBounds(100, 100, 720, 460);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		getContentPane().setLayout(null);
+		setBounds(100, 100, 750, 480);
+		setMinimumSize(new Dimension(650, 400)); // Tamaño mínimo seguro
 
-		getContentPane().add(getLblEmpleados());
-		getContentPane().add(getScrollPaneEmpleadosNoDeportivos());
-		getContentPane().add(getBtnSeleccionarDia());
-		getContentPane().add(getLblFecha());
-		getContentPane().add(getTxtFecha());
-		getContentPane().add(getLblRangoSemana());
-		getContentPane().add(getLblHorariosSemana());
-		getContentPane().add(getScrollPaneHorariosEmpleado());
-		getContentPane().add(getLblHorasSemanaTexto());
-		getContentPane().add(getLblHorasSemana());
-		getContentPane().add(getBtnAtras());
+		// Panel principal con BorderLayout y márgenes
+		JPanel contentPane = new JPanel(new BorderLayout(10, 10));
+		contentPane.setBorder(new EmptyBorder(10, 15, 10, 15));
+		setContentPane(contentPane);
+
+		// 1. ZONA NORTE: Barra de selección de fecha y rango de la semana
+		JPanel panelNorte = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
+		panelNorte.add(getBtnSeleccionarDia());
+		panelNorte.add(getLblFecha());
+		panelNorte.add(getTxtFecha());
+		panelNorte.add(getLblRangoSemana());
+		contentPane.add(panelNorte, BorderLayout.NORTH);
+
+		// 2. ZONA CENTRO: Dos columnas proporcionales (50% / 50%)
+		JPanel panelCentro = new JPanel(new GridLayout(1, 2, 15, 0));
+
+		// Columna izquierda: Empleados
+		JPanel panelIzquierdo = new JPanel(new BorderLayout(0, 5));
+		panelIzquierdo.add(getLblEmpleados(), BorderLayout.NORTH);
+		panelIzquierdo.add(getScrollPaneEmpleadosNoDeportivos(), BorderLayout.CENTER);
+		panelCentro.add(panelIzquierdo);
+
+		// Columna derecha: Horarios de la semana
+		JPanel panelDerecho = new JPanel(new BorderLayout(0, 5));
+		panelDerecho.add(getLblHorariosSemana(), BorderLayout.NORTH);
+		panelDerecho.add(getScrollPaneHorariosEmpleado(), BorderLayout.CENTER);
+		panelCentro.add(panelDerecho);
+
+		contentPane.add(panelCentro, BorderLayout.CENTER);
+
+		// 3. ZONA SUR: Resumen de horas a la izquierda y botón Atrás a la derecha
+		JPanel panelSur = new JPanel(new BorderLayout());
+		JPanel panelHoras = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		panelHoras.add(getLblHorasSemanaTexto());
+		panelHoras.add(getLblHorasSemana());
+
+		panelSur.add(panelHoras, BorderLayout.WEST);
+		panelSur.add(getBtnAtras(), BorderLayout.EAST);
+		contentPane.add(panelSur, BorderLayout.SOUTH);
 
 		setLocationRelativeTo(null);
-
 		inicializarTablasYEventos();
 	}
 
 	private JLabel getLblEmpleados() {
 		if (lblEmpleados == null) {
 			lblEmpleados = new JLabel("Empleados:");
-			lblEmpleados.setBounds(30, 20, 120, 14);
+			lblEmpleados.setFont(new Font("Tahoma", Font.BOLD, 12));
 		}
 		return lblEmpleados;
 	}
@@ -95,12 +128,10 @@ public class VentanaHorarioSemanal extends JFrame {
 		return tablaEmpleadosNoDeportivos;
 	}
 
-	
-
 	private JButton getBtnSeleccionarDia() {
 		if (btnSeleccionarDia == null) {
 			btnSeleccionarDia = new JButton("Seleccionar Día");
-			btnSeleccionarDia.setBounds(310, 20, 130, 28);
+			btnSeleccionarDia.setPreferredSize(new Dimension(130, 28));
 		}
 		return btnSeleccionarDia;
 	}
@@ -108,17 +139,15 @@ public class VentanaHorarioSemanal extends JFrame {
 	private JLabel getLblFecha() {
 		if (lblFecha == null) {
 			lblFecha = new JLabel("Fecha:");
-			lblFecha.setBounds(455, 25, 45, 14);
 		}
 		return lblFecha;
 	}
 
 	private JTextField getTxtFecha() {
 		if (txtFecha == null) {
-			txtFecha = new JTextField();
-			txtFecha.setText(LocalDate.now().toString());
+			txtFecha = new JTextField(LocalDate.now().toString());
 			txtFecha.setEditable(false);
-			txtFecha.setBounds(505, 20, 85, 28);
+			txtFecha.setPreferredSize(new Dimension(90, 26));
 			txtFecha.setColumns(10);
 		}
 		return txtFecha;
@@ -127,8 +156,7 @@ public class VentanaHorarioSemanal extends JFrame {
 	private JLabel getLblRangoSemana() {
 		if (lblRangoSemana == null) {
 			lblRangoSemana = new JLabel("Semana: -");
-			lblRangoSemana.setFont(new Font("Tahoma", Font.BOLD, 11));
-			lblRangoSemana.setBounds(310, 56, 375, 18);
+			lblRangoSemana.setFont(new Font("Tahoma", Font.BOLD, 12));
 		}
 		return lblRangoSemana;
 	}
@@ -136,7 +164,7 @@ public class VentanaHorarioSemanal extends JFrame {
 	private JLabel getLblHorariosSemana() {
 		if (lblHorariosSemana == null) {
 			lblHorariosSemana = new JLabel("Horarios de la semana seleccionada:");
-			lblHorariosSemana.setBounds(310, 82, 250, 14);
+			lblHorariosSemana.setFont(new Font("Tahoma", Font.BOLD, 12));
 		}
 		return lblHorariosSemana;
 	}
@@ -148,12 +176,10 @@ public class VentanaHorarioSemanal extends JFrame {
 		return tablaHorariosSemanales;
 	}
 
-
 	private JLabel getLblHorasSemanaTexto() {
 		if (lblHorasSemanaTexto == null) {
 			lblHorasSemanaTexto = new JLabel("Horas semana:");
 			lblHorasSemanaTexto.setFont(new Font("Tahoma", Font.BOLD, 12));
-			lblHorasSemanaTexto.setBounds(30, 360, 100, 20);
 		}
 		return lblHorasSemanaTexto;
 	}
@@ -162,8 +188,7 @@ public class VentanaHorarioSemanal extends JFrame {
 		if (lblHorasSemana == null) {
 			lblHorasSemana = new JLabel("0 h 00 min (máx. 40 h)");
 			lblHorasSemana.setFont(new Font("Tahoma", Font.BOLD, 12));
-			lblHorasSemana.setForeground(new Color(0, 0, 0));
-			lblHorasSemana.setBounds(135, 360, 220, 20);
+			lblHorasSemana.setForeground(new Color(0, 102, 204));
 		}
 		return lblHorasSemana;
 	}
@@ -171,7 +196,7 @@ public class VentanaHorarioSemanal extends JFrame {
 	private JButton getBtnAtras() {
 		if (btnAtras == null) {
 			btnAtras = new JButton("Atrás");
-			btnAtras.setBounds(565, 355, 120, 32);
+			btnAtras.setPreferredSize(new Dimension(110, 30));
 			btnAtras.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					dispose();
@@ -183,9 +208,8 @@ public class VentanaHorarioSemanal extends JFrame {
 	}
 
 	private void inicializarTablasYEventos() {
-		// Modelo de la tabla de empleados (no editable)
 		modeloEmpleados = new DefaultTableModel(
-				new Object[] { "DNI", "Nombre", "Apellidos",}, 0) {
+				new Object[] { "DNI", "Nombre", "Apellidos" }, 0) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -194,9 +218,8 @@ public class VentanaHorarioSemanal extends JFrame {
 		};
 		getTablaEmpleadosNoDeportivos().setModel(modeloEmpleados);
 
-		// Modelo de la tabla de horarios de la semana (no editable)
 		modeloHorariosSemanales = new DefaultTableModel(
-				new Object[] { "Día", "Fecha", "Hora Inicio", "Hora Fin", "Duración",}, 0) {
+				new Object[] { "Día", "Fecha", "Hora Inicio", "Hora Fin", "Duración" }, 0) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -205,14 +228,12 @@ public class VentanaHorarioSemanal extends JFrame {
 		};
 		getTablaHorariosSemanales().setModel(modeloHorariosSemanales);
 
-		// Evento al seleccionar un empleado
 		getTablaEmpleadosNoDeportivos().getSelectionModel().addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting()) {
 				refrescarTablaSemana();
 			}
 		});
 
-		// Evento para seleccionar fecha con JCalendar
 		getBtnSeleccionarDia().addActionListener(e -> SwingUtil.exceptionWrapper(() -> abrirDialogoCalendario()));
 
 		cargarEmpleados();
@@ -296,18 +317,18 @@ public class VentanaHorarioSemanal extends JFrame {
 			throw new UnexpectedException(ex);
 		}
 	}
+
 	private JScrollPane getScrollPaneEmpleadosNoDeportivos() {
 		if (scrollPaneEmpleadosNoDeportivos == null) {
 			scrollPaneEmpleadosNoDeportivos = new JScrollPane();
-			scrollPaneEmpleadosNoDeportivos.setBounds(30, 42, 260, 290);
 			scrollPaneEmpleadosNoDeportivos.setViewportView(getTablaEmpleadosNoDeportivos());
 		}
 		return scrollPaneEmpleadosNoDeportivos;
 	}
+
 	private JScrollPane getScrollPaneHorariosEmpleado() {
 		if (scrollPaneHorariosEmpleado == null) {
 			scrollPaneHorariosEmpleado = new JScrollPane();
-			scrollPaneHorariosEmpleado.setBounds(310, 102, 375, 230);
 			scrollPaneHorariosEmpleado.setViewportView(getTablaHorariosSemanales());
 		}
 		return scrollPaneHorariosEmpleado;

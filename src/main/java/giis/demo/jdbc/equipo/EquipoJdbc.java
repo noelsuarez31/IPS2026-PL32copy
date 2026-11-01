@@ -256,7 +256,7 @@ public class EquipoJdbc {
 	public static List<EventoOcupacion> obtenerEventosOcupacionPartido(Connection con, int idInstalacion,
 			LocalDate fecha) throws SQLException {
 		List<EventoOcupacion> eventos = new ArrayList<>();
-		// 1. Partidos en la instalación (Colisión - No sobreescribible)
+		// 1. Partidos en la instalación (No sobreescribible)
 		try (PreparedStatement pst = con.prepareStatement(QUERY_PARTIDOS_INSTALACION)) {
 			pst.setInt(1, idInstalacion);
 			pst.setString(2, fecha.toString());
@@ -268,7 +268,8 @@ public class EquipoJdbc {
 				}
 			}
 		}
-		// 2. Entrenamientos en la instalación (Colisión - No sobreescribible)
+		
+		// 2. Entrenamientos en la instalación (No sobreescribible)
 		try (PreparedStatement pst = con.prepareStatement(QUERY_ENTRENAMIENTOS_INSTALACION)) {
 			pst.setInt(1, idInstalacion);
 			pst.setString(2, fecha.toString());
@@ -280,6 +281,7 @@ public class EquipoJdbc {
 				}
 			}
 		}
+		
 		// 3. Franjas y Entrevistas de jugadores (Sobreescribible)
 		try (PreparedStatement pst = con.prepareStatement(QUERY_FRANJAS_Y_ENTREVISTAS)) {
 			pst.setString(1, fecha.toString());
@@ -300,6 +302,7 @@ public class EquipoJdbc {
 				}
 			}
 		}
+		
 		// 4. Reservas externas en la instalación (Sobreescribible)
 		try (PreparedStatement pst = con.prepareStatement(QUERY_RESERVAS_INSTALACION)) {
 			pst.setInt(1, idInstalacion);
@@ -312,6 +315,7 @@ public class EquipoJdbc {
 				}
 			}
 		}
+		
 		// 5. Jardinería horarios específicos (Sobreescribible)
 		try (PreparedStatement pst = con.prepareStatement(QUERY_JARDINERIA_ESPECIFICOS)) {
 			pst.setString(1, fecha.toString());
@@ -324,6 +328,7 @@ public class EquipoJdbc {
 				}
 			}
 		}
+		
 		// 6. Jardinería horarios periódicos (Sobreescribible)
 		try (PreparedStatement pst = con.prepareStatement(QUERY_JARDINERIA_PERIODICOS)) {
 			pst.setInt(1, fecha.getDayOfWeek().getValue());
@@ -337,9 +342,11 @@ public class EquipoJdbc {
 				}
 			}
 		}
+		
 		eventos.sort(Comparator.comparing(EventoOcupacion::getHoraInicio));
 		return eventos;
 	}
+	
 	/**
 	 * 1. Comprueba si el horario colisiona con otro partido o entrenamiento en la misma instalación.
 	 */
@@ -448,6 +455,7 @@ public class EquipoJdbc {
 					}
 				}
 			}
+			
 			// C. Insertar los precios por sección en PrecioSeccion
 			if (preciosSeccion != null && !preciosSeccion.isEmpty()) {
 				try (PreparedStatement pstPrecios = con.prepareStatement(QUERY_INSERT_PRECIO_SECCION)) {

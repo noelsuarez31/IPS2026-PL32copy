@@ -55,11 +55,11 @@ public class VentanaPlanificarPartido extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
-
+	private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	
 	private VentanaPrincipal vPrincipal;
 	private PlanificarPartidoService service;
 
-	// Paneles principales
 	private JPanel contentPane;
 	private JPanel pnDatosPartido;
 	private JPanel pnCamposPartido;
@@ -74,7 +74,6 @@ public class VentanaPlanificarPartido extends JFrame {
 	private JPanel pnDiaDelClub;
 	private JPanel pnBotonera;
 
-	// 1. Campos Encuentro
 	private JPanel pnLocal;
 	private JLabel lbLocal;
 	private JComboBox<Equipo> cbEquipoLocal;
@@ -103,17 +102,14 @@ public class VentanaPlanificarPartido extends JFrame {
 
 	private JButton btnConsultarOcupacion;
 
-	// 2. Tabla Ocupación
 	private JTable tablaOcupacion;
 	private DefaultTableModel modeloOcupacion;
 
-	// 3. Precios por Sección (A, B, C, D, E, F)
 	private JLabel lbRapido;
 	private JSpinner spPrecioRapido;
 	private JButton btnAplicarRapido;
 	private Map<TipoSeccion, JSpinner> spinnersSecciones = new HashMap<>();
-
-	// 4. Día del Club
+	
 	private JCheckBox chkDiaClub;
 	private JLabel lbSepDia1;
 	private JLabel lbEstadoDiaClub;
@@ -121,8 +117,7 @@ public class VentanaPlanificarPartido extends JFrame {
 	private JLabel lbSuplementoAbonados;
 	private JButton btnModificarSuplemento;
 	private double suplementoAbonadoActual = 15.0;
-
-	// 5. Botones inferiores
+	
 	private JButton btnCancelar;
 	private JButton btnDarDeAlta;
 
@@ -146,22 +141,13 @@ public class VentanaPlanificarPartido extends JFrame {
 		if (contentPane == null) {
 			contentPane = new JPanel(new BorderLayout(0, 8));
 			contentPane.setBorder(new EmptyBorder(10, 12, 10, 12));
-
-			// 1. Datos del encuentro (Norte)
 			contentPane.add(getPnDatosPartido(), BorderLayout.NORTH);
-
-			// 2. Ocupación en la fecha e instalación (Centro)
 			contentPane.add(getPnOcupacion(), BorderLayout.CENTER);
-
-			// 3. Precios + 4. Día del Club + Botonera (Sur)
 			contentPane.add(getPnSur(), BorderLayout.SOUTH);
 		}
 		return contentPane;
 	}
 
-	// =========================================================================
-	// 1. DATOS DEL PARTIDO (Local, Visitante, Instalación, JDateChooser, Spinners)
-	// =========================================================================
 	private JPanel getPnDatosPartido() {
 		if (pnDatosPartido == null) {
 			pnDatosPartido = new JPanel(new BorderLayout(0, 4));
@@ -397,7 +383,10 @@ public class VentanaPlanificarPartido extends JFrame {
 	public JButton getBtnConsultarOcupacion() {
 		if (btnConsultarOcupacion == null) {
 			btnConsultarOcupacion = new JButton("🔄 Consultar Ocupación");
-			btnConsultarOcupacion.addActionListener(e -> actualizarOcupacion());
+			btnConsultarOcupacion.addActionListener(e -> {
+				actualizarOcupacion();
+				consultarDisponibilidadHorarioPropuesto();
+			});
 		}
 		return btnConsultarOcupacion;
 	}
@@ -861,35 +850,87 @@ public class VentanaPlanificarPartido extends JFrame {
         }
     }
 
-	private void actualizarOcupacion() {
-		if (modeloOcupacion == null) {
+    private void actualizarOcupacion() {
+		if (modeloOcupacion == null || service == null) {
 			return;
 		}
+		
+		Instalacion inst = (Instalacion) getCbInstalacion().getSelectedItem();
+		Date d = getDcFecha().getDate();
+		if (inst == null || d == null) {
+			modeloOcupacion.setRowCount(0);
+			return;
+		}
+		LocalDate fecha = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		// Actualiza el título del recuadro con la fecha e instalación consultada
+		if (pnOcupacion != null) {
+			pnOcupacion.setBorder(new TitledBorder(
+					new EtchedBorder(EtchedBorder.LOWERED, null, null),
+					"2. Ocupación en la fecha e instalación (" + fecha.format(FORMATO_FECHA) + " - " + inst.getName() + ")",
+					TitledBorder.LEADING, TitledBorder.TOP,
+					new Font("Tahoma", Font.BOLD, 13), null));
+			pnOcupacion.repaint();
+		}
 		modeloOcupacion.setRowCount(0);
-
-		// 1. Partido previo (Colisión no sobreescribible en rojo suave)
-		modeloOcupacion.addRow(new Object[] {
-			"09:00", "11:00", "Partido", "Real Oviedo Vetusta vs Real Avilés", "No (Colisión)"
-		});
-
-		// 2. Entrevista de jugador (Sobreescribible en verde suave)
-		modeloOcupacion.addRow(new Object[] {
-			"12:00", "13:00", "Entrevista", "Carlos Martínez (Marca)", "Sí (Sobreescribible)"
-		});
-
-		// 3. Franja horaria de jugador (Sobreescribible en verde suave)
-		modeloOcupacion.addRow(new Object[] {
-			"13:00", "14:00", "Franja horaria", "David Costas (Disponible)", "Sí (Sobreescribible)"
-		});
-
-		// 4. Tarea de jardinería (Sobreescribible en verde suave)
-		modeloOcupacion.addRow(new Object[] {
-			"17:00", "18:30", "Jardinería", "Elena Pérez (Puesta a punto césped)", "Sí (Sobreescribible)"
-		});
-
-		// 5. Reserva externa (Sobreescribible en verde suave)
-		modeloOcupacion.addRow(new Object[] {
-			"18:30", "20:00", "Reserva Externa", "Marta Fernández (Reserva particular - 100.00 €)", "Sí (Sobreescribible)"
-		});
+		try {
+			List<EventoOcupacion> eventos = service.obtenerEventosOcupacion(inst.getInstalacionId(), fecha);
+			if (eventos.isEmpty()) {
+				// Muestra una fila informativa si la instalación está totalmente libre ese día
+				modeloOcupacion.addRow(new Object[] {
+					"--:--", "--:--", "Libre", "Instalación libre sin eventos ni ocupación para esta fecha", "-"
+				});
+			} else {
+				for (EventoOcupacion ev : eventos) {
+					modeloOcupacion.addRow(ev.toRow());
+				}
+			}
+		} catch (Exception ex) {
+			modeloOcupacion.addRow(new Object[] {
+				"--:--", "--:--", "Error", "Error al consultar ocupación: " + ex.getMessage(), "-"
+			});
+		}
+	}
+    
+    /**
+	 * Verifica si las horas seleccionadas en los selectores de inicio y fin son válidas
+	 * y si existe colisión o actividades sobreescribibles en ese intervalo concreto.
+	 */
+	private void consultarDisponibilidadHorarioPropuesto() {
+		Instalacion inst = (Instalacion) getCbInstalacion().getSelectedItem();
+		Date d = getDcFecha().getDate();
+		if (inst == null || d == null) {
+			JOptionPane.showMessageDialog(this, "Seleccione una instalación y fecha válidas.",
+					"Datos incompletos", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		LocalTime hIni = LocalTime.of((int) getSpHoraInicio().getValue(), (int) getSpMinInicio().getValue());
+		LocalTime hFin = LocalTime.of((int) getSpHoraFin().getValue(), (int) getSpMinFin().getValue());
+		if (!hFin.isAfter(hIni)) {
+			JOptionPane.showMessageDialog(this,
+					"La hora de finalización (" + hFin.format(FORMATO_HORA) + ") debe ser posterior a la de inicio (" + hIni.format(FORMATO_HORA) + ").",
+					"Horario no válido", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		LocalDate fecha = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		try {
+			// 1. Comprobar colisión no sobreescribible (partidos u otros eventos bloqueantes)
+			service.comprobarColisionesPartido(fecha, hIni, hFin, inst.getInstalacionId());
+			// 2. Comprobar actividades sobreescribibles (reservas, jardinería, franjas, entrevistas)
+			List<EventoOcupacion> cancelables = service.obtenerSobreescribiblesCoincidentes(fecha, hIni, hFin, inst.getInstalacionId());
+			if (cancelables.isEmpty()) {
+				JOptionPane.showMessageDialog(this,
+						"✅ Instalación disponible. No hay ningún conflicto en el horario " + hIni.format(FORMATO_HORA) + " - " + hFin.format(FORMATO_HORA) + ".",
+						"Horario disponible", JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(this,
+						"ℹ️ En el horario " + hIni.format(FORMATO_HORA) + " - " + hFin.format(FORMATO_HORA) + " hay " + cancelables.size()
+								+ " actividad(es) con menor prioridad (sobreescribibles).\nSe cancelarán automáticamente si registra el partido.",
+						"Actividades sobreescribibles detectadas", JOptionPane.INFORMATION_MESSAGE);
+			}
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(this,
+					"❌ " + ex.getMessage(),
+					"Colisión detectada", JOptionPane.WARNING_MESSAGE);
+		}
 	}
 }

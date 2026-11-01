@@ -49,28 +49,35 @@ public class EntrenamientoJdbc {
 			"SELECT r.id_reserva, r.hora_inicio, r.hora_fin, u.nombre "
 			+ "FROM Reserva r JOIN Usuario u ON r.id_usuario = u.id_usuario "
 			+ "WHERE r.id_instalacion = ? AND r.fecha = ?";
-	private static final String QUERY_JARDINERIA_ESPECIFICOS = 
-			"SELECT he.id_horario, be.nombre, be.apellido, he.hora_inicio, he.hora_fin "
-			+ "FROM HorarioEspecifico he JOIN EmpleadoNoDeportivo end ON he.dni_empleado = end.dni "
-			+ "JOIN BaseEmpleado be ON end.dni = be.dni "
-			+ "WHERE end.posicion = 'JARDINERIA' AND he.fecha = ?";
-	private static final String QUERY_JARDINERIA_PERIODICOS = 
-			"SELECT hp.id_horario, be.nombre, be.apellido, hp.hora_inicio, hp.hora_fin "
-			+ "FROM HorarioPeriodico hp JOIN EmpleadoNoDeportivo end ON hp.dni_empleado = end.dni "
-			+ "JOIN BaseEmpleado be ON end.dni = be.dni "
-			+ "WHERE end.posicion = 'JARDINERIA' AND hp.dia_semana = ? "
-			+ "AND hp.dni_empleado NOT IN (SELECT he.dni_empleado FROM HorarioEspecifico he WHERE he.fecha = ?)";
+	
+	private static final String QUERY_TAREAS_MANTENIMIENTO_INSTALACION = 
+			"SELECT tm.id_tarea, tm.hora_inicio, tm.hora_fin, tm.descripcion, "
+			+ "GROUP_CONCAT(be.nombre || ' ' || be.apellido, ', ') AS jardineros "
+			+ "FROM TareaMantenimiento tm "
+			+ "LEFT JOIN TareaMantenimientoJardinero tmj ON tm.id_tarea = tmj.id_tarea "
+			+ "LEFT JOIN BaseEmpleado be ON tmj.dni_jardinero = be.dni "
+			+ "WHERE tm.id_instalacion = ? AND tm.fecha = ? "
+			+ "GROUP BY tm.id_tarea "
+			+ "ORDER BY tm.hora_inicio";
 
 	private static final String QUERY_INSERT_TRAINING = 
 			"INSERT INTO Entrenamiento (fecha, hora_inicio, hora_fin, id_equipo, id_instalacion) "
 			+ "VALUES (?, ?, ?, ?, ?)";
 
 	private static final String DELETE_RESERVA_BY_ID = "DELETE FROM Reserva WHERE id_reserva = ?";
-	private static final String DELETE_HORARIO_ESPECIFICO_BY_ID = "DELETE FROM HorarioEspecifico WHERE id_horario = ?";
-	private static final String DELETE_HORARIO_PERIODICO_BY_ID = "DELETE FROM HorarioPeriodico WHERE id_horario = ?";
+	private static final String DELETE_TAREA_MANTENIMIENTO_JARDINEROS = 
+			"DELETE FROM TareaMantenimientoJardinero WHERE id_tarea = ?";
+	private static final String DELETE_TAREA_MANTENIMIENTO_BY_ID = 
+			"DELETE FROM TareaMantenimiento WHERE id_tarea = ?";
 	private static final String DELETE_ENTREVISTA_BY_FRANJA = "DELETE FROM Entrevista WHERE id_franja = ?";
 	private static final String DELETE_FRANJA_BY_ID = "DELETE FROM FranjaHoraria WHERE id_franja = ?";
 
+	/**
+	 * Obtiene una lista de dnis de los entrenadores con equipo asignado
+	 * @param con
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<String> obtenerDnisEntrenadoresConEquipo(Connection con) throws SQLException {
 		List<String> dnis = new ArrayList<>();
 		try (PreparedStatement pst = con.prepareStatement(QUERY_TRAINERS_WITH_TEAM);
@@ -82,6 +89,13 @@ public class EntrenamientoJdbc {
 		return dnis;
 	}
 
+	/**
+	 * Devuelve el nombre del equipo por el id del entrenador
+	 * @param con
+	 * @param dniEntrenador
+	 * @return
+	 * @throws SQLException
+	 */
 	public static String obtenerNombreEquipoPorDniEntrenador(Connection con, String dniEntrenador) throws SQLException {
 		try (PreparedStatement pst = con.prepareStatement(QUERY_TEAM_NAME_BY_TRAINER)) {
 			pst.setString(1, dniEntrenador);
@@ -94,6 +108,13 @@ public class EntrenamientoJdbc {
 		return "Sin equipo";
 	}
 
+	/**
+	 * Devuelve el id del equipo por el dni del entrenador
+	 * @param con
+	 * @param dniEntrenador
+	 * @return
+	 * @throws SQLException
+	 */
 	public static int obtenerIdEquipoPorDniEntrenador(Connection con, String dniEntrenador) throws SQLException {
 		try (PreparedStatement pst = con.prepareStatement(QUERY_TEAM_ID_BY_TRAINER)) {
 			pst.setString(1, dniEntrenador);
@@ -106,6 +127,16 @@ public class EntrenamientoJdbc {
 		return 0;
 	}
 
+	/**
+	 * Devuelve una lista con los eventos de ocupacion de 
+	 * la instalacion para esa fecha y hora
+	 * @param con
+	 * @param idEquipo
+	 * @param idInstalacion
+	 * @param fecha
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<EventoOcupacion> obtenerEventosOcupacion(Connection con, int idEquipo, int idInstalacion, LocalDate fecha) throws SQLException {
 		List<EventoOcupacion> eventos = new ArrayList<>();
 
@@ -175,27 +206,18 @@ public class EntrenamientoJdbc {
 		}
 
 		// 5. Jardinería (Sobreescribible)
-		try (PreparedStatement pst = con.prepareStatement(QUERY_JARDINERIA_ESPECIFICOS)) {
-			pst.setString(1, fecha.toString());
-			try (ResultSet rs = pst.executeQuery()) {
-				while (rs.next()) {
-					String det = rs.getString("nombre") + " " + rs.getString("apellido") + " (Específico)";
-					eventos.add(new EventoOcupacion(rs.getInt("id_horario"), "JARDINERIA_ESPECIFICO",
-							parseHora(rs.getString("hora_inicio")), parseHora(rs.getString("hora_fin")),
-							"Jardinería", det, true));
-				}
-			}
-		}
-
-		try (PreparedStatement pst = con.prepareStatement(QUERY_JARDINERIA_PERIODICOS)) {
-			pst.setInt(1, fecha.getDayOfWeek().getValue());
+		// 5. Tareas de jardinería en la instalación (Sobreescribible)
+		try (PreparedStatement pst = con.prepareStatement(QUERY_TAREAS_MANTENIMIENTO_INSTALACION)) {
+			pst.setInt(1, idInstalacion);
 			pst.setString(2, fecha.toString());
 			try (ResultSet rs = pst.executeQuery()) {
 				while (rs.next()) {
-					String det = rs.getString("nombre") + " " + rs.getString("apellido") + " (Periódico)";
-					eventos.add(new EventoOcupacion(rs.getInt("id_horario"), "JARDINERIA_PERIODICO",
-							parseHora(rs.getString("hora_inicio")), parseHora(rs.getString("hora_fin")),
-							"Jardinería", det, true));
+					String desc = rs.getString("descripcion");
+					String jardineros = rs.getString("jardineros");
+					String det = (jardineros != null && !jardineros.isBlank()) ? jardineros + " (" + desc + ")" : desc;
+					eventos.add(new EventoOcupacion(rs.getInt("id_tarea"), "TAREA_MANTENIMIENTO",
+							parseHora(rs.getString("hora_inicio")), parseHora(rs.getString("hora_fin")), "Jardinería",
+							det, true));
 				}
 			}
 		}
@@ -204,6 +226,17 @@ public class EntrenamientoJdbc {
 		return eventos;
 	}
 
+	/**
+	 * Comprueba las colisiones
+	 * @param con
+	 * @param fecha
+	 * @param horaInicio
+	 * @param horaFin
+	 * @param idEquipo
+	 * @param idInstalacion
+	 * @throws SQLException
+	 * @throws PersistenceException
+	 */
 	public static void comprobarColisiones(Connection con, LocalDate fecha, LocalTime horaInicio,
 			LocalTime horaFin, int idEquipo, int idInstalacion) throws SQLException, PersistenceException {
 		List<EventoOcupacion> eventos = obtenerEventosOcupacion(con, idEquipo, idInstalacion, fecha);
@@ -219,6 +252,18 @@ public class EntrenamientoJdbc {
 		}
 	}
 
+	/**
+	 * Devuelve una lista de eventoos de ocupacion sobreescribibles
+	 * que se solapan con el entrenamiento a añadir
+	 * @param con
+	 * @param idEquipo
+	 * @param idInstalacion
+	 * @param fecha
+	 * @param horaInicio
+	 * @param horaFin
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<EventoOcupacion> obtenerEventosSobreescribiblesSolapados(Connection con, int idEquipo,
 			int idInstalacion, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) throws SQLException {
 		List<EventoOcupacion> todos = obtenerEventosOcupacion(con, idEquipo, idInstalacion, fecha);
@@ -233,6 +278,18 @@ public class EntrenamientoJdbc {
 		return solapados;
 	}
 
+	/**
+	 * Guarda el entrenamiento seleccionado, eliminando los eventos 
+	 * coincidentes de forma transaccional
+	 * @param con
+	 * @param fecha
+	 * @param horaInicio
+	 * @param horaFin
+	 * @param idEquipo
+	 * @param idInstalacion
+	 * @param eventosACancelar
+	 * @throws SQLException
+	 */
 	public static void guardarEntrenamientoCancelandoCoincidentes(Connection con, LocalDate fecha,
 			LocalTime horaInicio, LocalTime horaFin, int idEquipo, int idInstalacion,
 			List<EventoOcupacion> eventosACancelar) throws SQLException {
@@ -248,13 +305,14 @@ public class EntrenamientoJdbc {
 							pst.setInt(1, e.getIdReferencia());
 							pst.executeUpdate();
 						}
-					} else if ("JARDINERIA_ESPECIFICO".equals(e.getOrigen())) {
-						try (PreparedStatement pst = con.prepareStatement(DELETE_HORARIO_ESPECIFICO_BY_ID)) {
+					} else if ("TAREA_MANTENIMIENTO".equals(e.getOrigen())) {
+						// 1º Suprimir la asignación a los jardineros
+						try (PreparedStatement pst = con.prepareStatement(DELETE_TAREA_MANTENIMIENTO_JARDINEROS)) {
 							pst.setInt(1, e.getIdReferencia());
 							pst.executeUpdate();
 						}
-					} else if ("JARDINERIA_PERIODICO".equals(e.getOrigen())) {
-						try (PreparedStatement pst = con.prepareStatement(DELETE_HORARIO_PERIODICO_BY_ID)) {
+						// 2º Eliminar la tarea de la instalación
+						try (PreparedStatement pst = con.prepareStatement(DELETE_TAREA_MANTENIMIENTO_BY_ID)) {
 							pst.setInt(1, e.getIdReferencia());
 							pst.executeUpdate();
 						}

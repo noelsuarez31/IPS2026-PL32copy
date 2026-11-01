@@ -17,6 +17,7 @@ import giis.demo.model.contrataciones.GestorEmpleados;
 import giis.demo.model.entrevistas.CrearEntrevistaService;
 import giis.demo.model.entrevistas.CrearFranjaService;
 import giis.demo.model.equipo.AñadirEquipoService;
+import giis.demo.model.equipo.CrearEntrenamientoService;
 import giis.demo.model.historial.HistorialVentas;
 import giis.demo.model.horarios.GestionHorarioSemanal;
 import giis.demo.model.horarios.GestionHorariosEspecificos;
@@ -29,6 +30,7 @@ import giis.demo.ui.entradas.VentanaVentaEntradas;
 import giis.demo.ui.entrevistas.VentanaCrearEntrevistas;
 import giis.demo.ui.entrevistas.VentanaCrearFranjas;
 import giis.demo.ui.equipo.VentanaAñadirEquipo;
+import giis.demo.ui.equipo.VentanaCrearEntrenamiento;
 import giis.demo.ui.historial.VentanaHistorialVentas;
 import giis.demo.ui.horarios.VentanaHorarioEspecifico;
 import giis.demo.ui.horarios.VentanaHorarioPeriodico;
@@ -47,6 +49,7 @@ public class VentanaPrincipal extends JFrame {
 	private CrearFranjaService cfs = new CrearFranjaService();
 	private CrearEntrevistaService ces = new CrearEntrevistaService();
 	private GestorEmpleados gestorEmpleados = new GestorEmpleados();
+	private CrearEntrenamientoService crearEntrenoService = new CrearEntrenamientoService();
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -72,6 +75,7 @@ public class VentanaPrincipal extends JFrame {
 	private JMenu mnAbonado;
 	private JMenuItem mntmComprarAbono;
 	private JMenuItem mntmAñadirMantenimiento;
+	private JMenuItem mntmRegistrarEntrenamiento;
 
 	/**
 	 * Create the frame.
@@ -138,6 +142,7 @@ public class VentanaPrincipal extends JFrame {
 			mnEntrenador = new JMenu("Entrenador");
 			mnEntrenador.setMnemonic('T');
 			mnEntrenador.add(getMntmCrearFranjas());
+			mnEntrenador.add(getMntmRegistrarEntrenamiento());
 		}
 		return mnEntrenador;
 	}
@@ -536,5 +541,27 @@ public class VentanaPrincipal extends JFrame {
 		this.setVisible(false);
 		vAsignarMantenimiento.setVisible(true);
 		
+	}
+	private JMenuItem getMntmRegistrarEntrenamiento() {
+		if (mntmRegistrarEntrenamiento == null) {
+			mntmRegistrarEntrenamiento = new JMenuItem("Registrar entrenamiento");
+			mntmRegistrarEntrenamiento.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					gestionRegistrarEntrenamiento();
+				}
+			});
+		}
+		return mntmRegistrarEntrenamiento;
+	}
+
+	protected void gestionRegistrarEntrenamiento() {
+		VentanaCrearEntrenamiento ces2 = new VentanaCrearEntrenamiento(this);
+		this.setVisible(false);
+		ces2.setVisible(true);
+	}
+	
+	public CrearEntrenamientoService getCrearEntrenamientoService() {
+		return this.crearEntrenoService;
 	}
 }

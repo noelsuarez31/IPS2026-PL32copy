@@ -845,23 +845,25 @@ INSERT INTO "EmpleadoDeportivo" ("dni", "posicion") VALUES
 ('95000009I', 'JUGADOR'),
 ('95000010J', 'JUGADOR');
 
--- 1. Tarea de jardinería específica (Elena Pérez: 08:00 a 09:30) [Sobreescribible]
-INSERT INTO "HorarioEspecifico" ("dni_empleado", "fecha", "hora_inicio", "hora_fin") 
-VALUES ('70707070F', '2026-11-20', '08:00', '09:30');
--- 2. Reserva externa de socio (Marta Fernández: 10:00 a 11:30, Importe: 50.0) [Sobreescribible]
+-- 1. Reserva externa de socio (Marta Fernández: 10:00 a 11:30, Importe: 50.0) [Sobreescribible]
 INSERT INTO "Reserva" ("fecha", "hora_inicio", "hora_fin", "importe", "fecha_registro", "id_usuario", "id_instalacion") 
 VALUES ('2026-11-20', '10:00', '11:30', 50.0, '2026-10-27 10:00', 1, 1);
--- 3. Franja con entrevista asignada a un medio (Carlos Martínez - Marca: 12:00 a 13:00) [Sobreescribible]
+-- 2. Franja con entrevista asignada a un medio (Carlos Martínez - Marca: 12:00 a 13:00) [Sobreescribible]
 INSERT INTO "FranjaHoraria" ("dni_jugador", "fecha", "hora_inicio", "hora_fin") 
 VALUES ('93000001A', '2026-11-20', '12:00', '13:00');
 INSERT INTO "Entrevista" ("id_franja", "nombre_medio") 
 VALUES ((SELECT last_insert_rowid()), 'Marca');
--- 4. Franja libre de otro jugador del equipo (David Costas: 13:00 a 14:00) [Sobreescribible]
+-- 3. Franja libre de otro jugador del equipo (David Costas: 13:00 a 14:00) [Sobreescribible]
 INSERT INTO "FranjaHoraria" ("dni_jugador", "fecha", "hora_inicio", "hora_fin") 
 VALUES ('93000002B', '2026-11-20', '13:00', '14:00');
--- 5. Entrenamiento de otro equipo en la misma instalación (Real Oviedo B: 16:00 a 17:30) [No sobreescribible - Bloqueante]
+-- 4. Entrenamiento de otro equipo en la misma instalación (Real Oviedo B: 16:00 a 17:30) [No sobreescribible - Bloqueante]
 INSERT INTO "Entrenamiento" ("fecha", "hora_inicio", "hora_fin", "id_equipo", "id_instalacion") 
 VALUES ('2026-11-20', '16:00', '17:30', 2, 1);
--- 6. Partido oficial en la misma instalación (Real Oviedo A vs Real Oviedo B: 18:00 a 20:00) [No sobreescribible - Bloqueante]
+-- 5. Partido oficial en la misma instalación (Real Oviedo A vs Real Oviedo B: 18:00 a 20:00) [No sobreescribible - Bloqueante]
 INSERT INTO "Partido" ("fecha", "hora_inicio", "hora_fin", "id_local", "id_visitante", "id_instalacion") 
 VALUES ('2026-11-20', '18:00', '20:00', 1, 2, 1);
+-- 6. Tarea de jardinería en la instalación (Corte de césped: 08:00 a 09:30) [Sobreescribible]
+INSERT INTO "TareaMantenimiento" ("id_instalacion", "fecha", "hora_inicio", "hora_fin", "descripcion") 
+VALUES (1, '2026-11-20', '08:00', '09:30', 'Corte de césped');
+INSERT INTO "TareaMantenimientoJardinero" ("id_tarea", "dni_jardinero") 
+VALUES ((SELECT last_insert_rowid()), '70707070F');

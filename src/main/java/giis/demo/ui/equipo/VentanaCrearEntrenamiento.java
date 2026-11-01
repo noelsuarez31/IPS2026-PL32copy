@@ -98,6 +98,15 @@ public class VentanaCrearEntrenamiento extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1160, 650);
 		setLocationRelativeTo(null);
+		
+		addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent e) {
+				if (vPrincipal != null) {
+					vPrincipal.setVisible(true);
+				}
+			}
+		});
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -141,6 +150,7 @@ public class VentanaCrearEntrenamiento extends JFrame {
 			cbDniEntrenador.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			cbDniEntrenador.setPreferredSize(new Dimension(140, 26));
 			cbDniEntrenador.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					actualizarEquipoEntrenador();
 					actualizarEventosYOcupacion();
@@ -214,6 +224,7 @@ public class VentanaCrearEntrenamiento extends JFrame {
 			listInstalaciones.setFont(new Font("Tahoma", Font.PLAIN, 13));
 			listInstalaciones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			listInstalaciones.addListSelectionListener(new ListSelectionListener() {
+				@Override
 				public void valueChanged(ListSelectionEvent e) {
 					if (!e.getValueIsAdjusting()) {
 						actualizarEventosYOcupacion();
@@ -385,7 +396,7 @@ public class VentanaCrearEntrenamiento extends JFrame {
 
 	private JSpinner getSpMinInicio() {
 		if (spMinInicio == null) {
-			spMinInicio = new JSpinner(new SpinnerNumberModel(0, 0, 59, 1));
+			spMinInicio = new JSpinner(new SpinnerNumberModel(0, 0, 55, 5));
 			spMinInicio.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			spMinInicio.setPreferredSize(new Dimension(50, 26));
 			spMinInicio.setEditor(new JSpinner.NumberEditor(spMinInicio, "00"));
@@ -432,7 +443,7 @@ public class VentanaCrearEntrenamiento extends JFrame {
 
 	private JSpinner getSpMinFin() {
 		if (spMinFin == null) {
-			spMinFin = new JSpinner(new SpinnerNumberModel(0, 0, 59, 1));
+			spMinFin = new JSpinner(new SpinnerNumberModel(0, 0, 55, 5));
 			spMinFin.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			spMinFin.setPreferredSize(new Dimension(50, 26));
 			spMinFin.setEditor(new JSpinner.NumberEditor(spMinFin, "00"));
@@ -453,6 +464,7 @@ public class VentanaCrearEntrenamiento extends JFrame {
 			btnCrearEntrenamiento = new JButton("Crear Entrenamiento");
 			btnCrearEntrenamiento.setFont(new Font("Tahoma", Font.BOLD, 14));
 			btnCrearEntrenamiento.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					accionCrearEntrenamiento();
 				}
@@ -474,6 +486,7 @@ public class VentanaCrearEntrenamiento extends JFrame {
 			btnAtras = new JButton("Atr\u00E1s");
 			btnAtras.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			btnAtras.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					dispose();
 					if (vPrincipal != null) {

@@ -396,11 +396,6 @@ INSERT INTO "Entrenamiento" ("fecha", "hora_inicio", "hora_fin", "id_equipo", "i
 ('2026-10-21', '16:00:00', '18:00:00', 1, 1),
 ('2026-10-27', '17:00:00', '19:00:00', 1, 1);
 
-INSERT INTO "Partido" ("fecha", "hora_inicio", "hora_fin", "id_local", "id_visitante", "id_instalacion") VALUES 
-('2026-10-21', '21:00:00', '23:00:00', 1, 2, 1),
-('2026-10-27', '18:30:00', '20:30:00', 3, 4, 2),
-('2026-10-29', '19:30:00', '22:30:00', 5, 6, 2),
-('2026-11-03', '14:30:00', '16:30:00', 7, 9, 3);
 
 insert into Instalacion (nombre) values ('Campo de fútbol 1');
 insert into Instalacion (nombre) values ('Campo de fútbol 2');

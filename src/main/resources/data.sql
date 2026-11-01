@@ -26,6 +26,9 @@ delete from Abono;
 delete from Abonado;
 delete from TareaMantenimientoJardinero;
 delete from TareaMantenimiento;
+delete from Accion;
+delete from Campana;
+delete from Accionista;
 
 INSERT INTO "Producto" ("nombre", "tipo", "precio") VALUES 
 ('Sudadera', 'ParteArriba', 65.00),
@@ -844,3 +847,40 @@ INSERT INTO "EmpleadoDeportivo" ("dni", "posicion") VALUES
 ('95000008H', 'JUGADOR'),
 ('95000009I', 'JUGADOR'),
 ('95000010J', 'JUGADOR');
+
+INSERT INTO "Accionista" ("dni", "nombre", "apellidos", "email") VALUES
+('71987654A', 'Lucas', 'Vega Fernández', 'lucas.vega@correo.es'),
+('71876543B', 'Lucía', 'Fernández González', 'lucia.fernandez@correo.es'),
+('71765432C', 'Carlos', 'Rodríguez Menéndez', 'carlos.rodriguez@correo.es'),
+('71654321D', 'Elena', 'García Suárez', 'elena.garcia@correo.es');
+
+INSERT INTO "Campana" ("id_campana", "nombre", "fase", "precio_emision") VALUES
+(1, 'Campaña 2024', 1, 10.00),
+(2, 'Campaña 2024', 2, 12.00),
+(3, 'Ampliación 2025', 1, 15.00);
+
+-- Acciones de prueba (para Lucas Vega Fernández - 71987654A, exactamente como en el prototipo)
+INSERT INTO "Accion" ("id_accion", "dni_propietario", "fecha_adquisicion", "precio_adquisicion", "en_venta", "precio_venta", "origen_tipo", "id_campana", "vendedor_previo") VALUES
+(1, '71987654A', '2024-01-10', 10.00, 1, 18.00, 'CAMPANA', 1, NULL),
+(2, '71987654A', '2024-01-11', 15.00, 1, NULL, 'COMPRA_ACCIONISTA', NULL, 'Lucía Fernández González'),
+(3, '71987654A', '2025-02-03', 12.00, 0, NULL, 'COMPRA_ACCIONISTA', NULL, 'Carlos Rodríguez Menéndez'),
+(4, '71987654A', '2025-03-15', 15.00, 0, NULL, 'CAMPANA', 3, NULL);
+
+-- Acciones de prueba para otros accionistas (para un total de 20 en el club)
+INSERT INTO "Accion" ("id_accion", "dni_propietario", "fecha_adquisicion", "precio_adquisicion", "en_venta", "precio_venta", "origen_tipo", "id_campana", "vendedor_previo") VALUES
+(5, '71876543B', '2024-01-10', 10.00, 0, NULL, 'CAMPANA', 1, NULL),
+(6, '71876543B', '2024-01-10', 10.00, 0, NULL, 'CAMPANA', 1, NULL),
+(7, '71876543B', '2024-06-01', 12.00, 1, 16.00, 'CAMPANA', 2, NULL),
+(8, '71876543B', '2024-06-01', 12.00, 0, NULL, 'CAMPANA', 2, NULL),
+(9, '71876543B', '2025-03-15', 15.00, 0, NULL, 'CAMPANA', 3, NULL),
+(10, '71765432C', '2024-01-10', 10.00, 1, 14.00, 'CAMPANA', 1, NULL),
+(11, '71765432C', '2024-01-10', 10.00, 0, NULL, 'CAMPANA', 1, NULL),
+(12, '71765432C', '2024-06-01', 12.00, 0, NULL, 'CAMPANA', 2, NULL),
+(13, '71765432C', '2024-06-01', 12.00, 1, 15.00, 'CAMPANA', 2, NULL),
+(14, '71765432C', '2025-03-15', 15.00, 0, NULL, 'CAMPANA', 3, NULL),
+(15, '71654321D', '2024-01-10', 10.00, 0, NULL, 'CAMPANA', 1, NULL),
+(16, '71654321D', '2024-01-10', 10.00, 0, NULL, 'CAMPANA', 1, NULL),
+(17, '71654321D', '2024-06-01', 12.00, 0, NULL, 'CAMPANA', 2, NULL),
+(18, '71654321D', '2024-06-01', 12.00, 0, NULL, 'CAMPANA', 2, NULL),
+(19, '71654321D', '2025-03-15', 15.00, 0, NULL, 'CAMPANA', 3, NULL),
+(20, '71654321D', '2025-03-15', 15.00, 0, NULL, 'CAMPANA', 3, NULL);

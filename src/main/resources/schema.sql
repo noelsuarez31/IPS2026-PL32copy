@@ -30,6 +30,10 @@ drop table if exists Abono;
 drop table if exists TareaMantenimientoJardinero;
 drop table if exists TareaMantenimiento;
 
+drop table if exists Accion;
+drop table if exists Campana;
+drop table if exists Accionista;
+
 CREATE TABLE IF NOT EXISTS "butaca" (
 	"id_butaca"	INTEGER,
 	"tribuna"	TEXT NOT NULL CHECK("tribuna" IN ('A', 'B', 'C', 'D')),
@@ -252,4 +256,32 @@ CREATE TABLE IF NOT EXISTS "TareaMantenimientoJardinero" (
 	PRIMARY KEY("id_tarea", "dni_jardinero"),
 	FOREIGN KEY("id_tarea") REFERENCES "TareaMantenimiento"("id_tarea") ON DELETE CASCADE,
 	FOREIGN KEY("dni_jardinero") REFERENCES "EmpleadoNoDeportivo"("dni") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "Accionista" (
+	"dni" TEXT PRIMARY KEY,
+	"nombre" TEXT NOT NULL,
+	"apellidos" TEXT NOT NULL,
+	"email" TEXT
+);
+
+CREATE TABLE IF NOT EXISTS "Campana" (
+	"id_campana" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"nombre" TEXT NOT NULL,
+	"fase" INTEGER NOT NULL CHECK("fase" > 0),
+	"precio_emision" REAL NOT NULL CHECK("precio_emision" > 0)
+);
+
+CREATE TABLE IF NOT EXISTS "Accion" (
+	"id_accion" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"dni_propietario" TEXT NOT NULL,
+	"fecha_adquisicion" TEXT NOT NULL,
+	"precio_adquisicion" REAL NOT NULL CHECK("precio_adquisicion" > 0),
+	"en_venta" INTEGER NOT NULL DEFAULT 0 CHECK("en_venta" IN (0, 1)),
+	"precio_venta" REAL DEFAULT NULL,
+	"origen_tipo" TEXT NOT NULL CHECK("origen_tipo" IN ('CAMPANA', 'COMPRA_ACCIONISTA')),
+	"id_campana" INTEGER,
+	"vendedor_previo" TEXT,
+	FOREIGN KEY("dni_propietario") REFERENCES "Accionista"("dni"),
+	FOREIGN KEY("id_campana") REFERENCES "Campana"("id_campana")
 );

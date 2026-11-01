@@ -25,6 +25,9 @@ import giis.demo.jdbc.historial.HistorialJdbc;
 import giis.demo.jdbc.horarios.HorarioEspecificoJdbc;
 import giis.demo.jdbc.horarios.HorarioPeriodicoJdbc;
 import giis.demo.jdbc.mantenimiento.TareaMantenimientoJdbc;
+import giis.demo.jdbc.accion.AccionJdbc;
+import giis.demo.model.accion.Accion;
+import giis.demo.model.accion.Accionista;
 import giis.demo.jdbc.reservas.ComprobarDisponibilidadJdbc;
 import giis.demo.jdbc.reservas.InstalacionJdbc;
 import giis.demo.jdbc.reservas.ReservaJdbc;
@@ -761,4 +764,32 @@ public class JDBC {
 		return TareaMantenimientoJdbc.getTareasInstalacionFecha(con, idInstalacion, fecha);
 	}
 	
+
+	/**
+	 * Devuelve la lista completa de todos los accionistas registrados.
+	 */
+	public List<Accionista> getAccionistas() throws SQLException {
+		return AccionJdbc.getAccionistas(con);
+	}
+
+	/**
+	 * Busca un accionista por su DNI.
+	 */
+	public Accionista getAccionistaByDni(String dni) throws SQLException {
+		return AccionJdbc.getAccionistaByDni(con, dni);
+	}
+
+	/**
+	 * Devuelve el número total de acciones emitidas por el club.
+	 */
+	public int getTotalAccionesEmitidas() throws SQLException {
+		return AccionJdbc.getTotalAccionesClub(con);
+	}
+
+	/**
+	 * Devuelve las acciones pertenecientes a un accionista ordenadas por fecha de adquisición.
+	 */
+	public List<Accion> getAccionesPropietario(String dni) throws SQLException {
+		return AccionJdbc.getAccionesPropietario(con, dni);
+	}
 }

@@ -844,3 +844,21 @@ INSERT INTO "EmpleadoDeportivo" ("dni", "posicion") VALUES
 ('95000008H', 'JUGADOR'),
 ('95000009I', 'JUGADOR'),
 ('95000010J', 'JUGADOR');
+
+-- 1. Entrenamiento en la instalación -> NO SOBREESCRIBIBLE (Colisión bloqueante)
+INSERT INTO "Entrenamiento" ("fecha", "hora_inicio", "hora_fin", "id_equipo", "id_instalacion") 
+VALUES ('2026-11-20', '09:30', '11:00', 1, 1);
+-- 2. Reserva externa de particular -> SOBREESCRIBIBLE
+INSERT INTO "Reserva" ("fecha", "hora_inicio", "hora_fin", "importe", "fecha_registro", "id_usuario", "id_instalacion") 
+VALUES ('2026-11-20', '11:30', '13:00', 75.0, '2026-11-01 10:00', 1, 1);
+-- 3. Franja horaria libre de jugador (Borja Bastón) -> SOBREESCRIBIBLE
+INSERT INTO "FranjaHoraria" ("dni_jugador", "fecha", "hora_inicio", "hora_fin") 
+VALUES ('11111111A', '2026-11-20', '13:00', '14:00');
+-- 4. Entrevista asignada a franja (Borja Bastón con Marca) -> SOBREESCRIBIBLE
+INSERT INTO "FranjaHoraria" ("dni_jugador", "fecha", "hora_inicio", "hora_fin") 
+VALUES ('11111111A', '2026-11-20', '14:00', '15:30');
+INSERT INTO "Entrevista" ("id_franja", "nombre_medio") 
+VALUES ((SELECT MAX(id_franja) FROM FranjaHoraria WHERE fecha = '2026-11-20' AND hora_inicio = '14:00'), 'Marca');
+-- 5. Partido previo ya programado en el estadio -> NO SOBREESCRIBIBLE (Colisión bloqueante)
+INSERT INTO "Partido" ("fecha", "hora_inicio", "hora_fin", "id_local", "id_visitante", "id_instalacion", "dia_del_club", "precio_abonado") 
+VALUES ('2026-11-20', '18:00', '20:00', 1, 4, 1, 0, 0.0);

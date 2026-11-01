@@ -7,6 +7,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -37,9 +41,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-
 import com.toedter.calendar.JDateChooser;
-
 import giis.demo.model.entradas.enumerados.TipoSeccion;
 import giis.demo.model.equipo.Equipo;
 import giis.demo.model.equipo.EventoOcupacion;
@@ -129,6 +131,14 @@ public class VentanaPlanificarPartido extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1220, 720);
 		setLocationRelativeTo(null);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if (vPrincipal != null) {
+					vPrincipal.setVisible(true);
+				}
+			}
+		});
 
 		setContentPane(getContentPane());
 
@@ -327,11 +337,12 @@ public class VentanaPlanificarPartido extends JFrame {
 	public JSpinner getSpHoraInicio() {
 		if (spHoraInicio == null) {
 			spHoraInicio = new JSpinner(new SpinnerNumberModel(18, 0, 23, 1));
+			spHoraInicio.setEditor(new JSpinner.NumberEditor(spHoraInicio, "00")); // <-- 2 cifras siempre
 			spHoraInicio.setPreferredSize(new Dimension(55, 24));
 		}
 		return spHoraInicio;
 	}
-
+	
 	private JLabel getLbSepInicio() {
 		if (lbSepInicio == null) {
 			lbSepInicio = new JLabel(":");
@@ -343,6 +354,7 @@ public class VentanaPlanificarPartido extends JFrame {
 	public JSpinner getSpMinInicio() {
 		if (spMinInicio == null) {
 			spMinInicio = new JSpinner(new SpinnerNumberModel(30, 0, 59, 5));
+			spMinInicio.setEditor(new JSpinner.NumberEditor(spMinInicio, "00")); // <-- 2 cifras siempre
 			spMinInicio.setPreferredSize(new Dimension(55, 24));
 		}
 		return spMinInicio;
@@ -359,6 +371,7 @@ public class VentanaPlanificarPartido extends JFrame {
 	public JSpinner getSpHoraFin() {
 		if (spHoraFin == null) {
 			spHoraFin = new JSpinner(new SpinnerNumberModel(20, 0, 23, 1));
+			spHoraFin.setEditor(new JSpinner.NumberEditor(spHoraFin, "00")); // <-- 2 cifras siempre
 			spHoraFin.setPreferredSize(new Dimension(55, 24));
 		}
 		return spHoraFin;
@@ -375,6 +388,7 @@ public class VentanaPlanificarPartido extends JFrame {
 	public JSpinner getSpMinFin() {
 		if (spMinFin == null) {
 			spMinFin = new JSpinner(new SpinnerNumberModel(30, 0, 59, 5));
+			spMinFin.setEditor(new JSpinner.NumberEditor(spMinFin, "00")); // <-- 2 cifras siempre
 			spMinFin.setPreferredSize(new Dimension(55, 24));
 		}
 		return spMinFin;
@@ -660,7 +674,13 @@ public class VentanaPlanificarPartido extends JFrame {
 	public JButton getBtnCancelar() {
 		if (btnCancelar == null) {
 			btnCancelar = new JButton("Cancelar / Volver");
-			btnCancelar.addActionListener(e -> dispose());
+			btnCancelar.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					dispose();
+					vPrincipal.setVisible(true);
+				}
+			});
 		}
 		return btnCancelar;
 	}
@@ -919,11 +939,11 @@ public class VentanaPlanificarPartido extends JFrame {
 			List<EventoOcupacion> cancelables = service.obtenerSobreescribiblesCoincidentes(fecha, hIni, hFin, inst.getInstalacionId());
 			if (cancelables.isEmpty()) {
 				JOptionPane.showMessageDialog(this,
-						"✅ Instalación disponible. No hay ningún conflicto en el horario " + hIni.format(FORMATO_HORA) + " - " + hFin.format(FORMATO_HORA) + ".",
+						"Instalación disponible. No hay ningún conflicto en el horario " + hIni.format(FORMATO_HORA) + " - " + hFin.format(FORMATO_HORA) + ".",
 						"Horario disponible", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				JOptionPane.showMessageDialog(this,
-						"ℹ️ En el horario " + hIni.format(FORMATO_HORA) + " - " + hFin.format(FORMATO_HORA) + " hay " + cancelables.size()
+						"En el horario " + hIni.format(FORMATO_HORA) + " - " + hFin.format(FORMATO_HORA) + " hay " + cancelables.size()
 								+ " actividad(es) con menor prioridad (sobreescribibles).\nSe cancelarán automáticamente si registra el partido.",
 						"Actividades sobreescribibles detectadas", JOptionPane.INFORMATION_MESSAGE);
 			}

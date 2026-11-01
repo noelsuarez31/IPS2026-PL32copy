@@ -58,18 +58,15 @@ public class EquipoJdbc {
 			+ "FROM Reserva r JOIN Usuario u ON r.id_usuario = u.id_usuario "
 			+ "WHERE r.id_instalacion = ? AND r.fecha = ?";
 	
-	private static final String QUERY_JARDINERIA_ESPECIFICOS = 
-			"SELECT he.id_horario, be.nombre, be.apellido, he.hora_inicio, he.hora_fin "
-			+ "FROM HorarioEspecifico he JOIN EmpleadoNoDeportivo end ON he.dni_empleado = end.dni "
-			+ "JOIN BaseEmpleado be ON end.dni = be.dni "
-			+ "WHERE end.posicion = 'JARDINERIA' AND he.fecha = ?";
-	
-	private static final String QUERY_JARDINERIA_PERIODICOS = 
-			"SELECT hp.id_horario, be.nombre, be.apellido, hp.hora_inicio, hp.hora_fin "
-			+ "FROM HorarioPeriodico hp JOIN EmpleadoNoDeportivo end ON hp.dni_empleado = end.dni "
-			+ "JOIN BaseEmpleado be ON end.dni = be.dni "
-			+ "WHERE end.posicion = 'JARDINERIA' AND hp.dia_semana = ? "
-			+ "AND hp.dni_empleado NOT IN (SELECT he.dni_empleado FROM HorarioEspecifico he WHERE he.fecha = ?)";
+	private static final String QUERY_TAREAS_MANTENIMIENTO_INSTALACION = 
+			"SELECT tm.id_tarea, tm.hora_inicio, tm.hora_fin, tm.descripcion, "
+			+ "GROUP_CONCAT(be.nombre || ' ' || be.apellido, ', ') AS jardineros "
+			+ "FROM TareaMantenimiento tm "
+			+ "LEFT JOIN TareaMantenimientoJardinero tmj ON tm.id_tarea = tmj.id_tarea "
+			+ "LEFT JOIN BaseEmpleado be ON tmj.dni_jardinero = be.dni "
+			+ "WHERE tm.id_instalacion = ? AND tm.fecha = ? "
+			+ "GROUP BY tm.id_tarea "
+			+ "ORDER BY tm.hora_inicio";
 	
 	private static final String QUERY_INSERT_PARTIDO = 
 			"INSERT INTO Partido (fecha, hora_inicio, hora_fin, id_local, id_visitante, id_instalacion, dia_del_club, precio_abonado) "
@@ -80,9 +77,11 @@ public class EquipoJdbc {
 	
 	private static final String DELETE_RESERVA_BY_ID = "DELETE FROM Reserva WHERE id_reserva = ?";
 	
-	private static final String DELETE_HORARIO_ESPECIFICO_BY_ID = "DELETE FROM HorarioEspecifico WHERE id_horario = ?";
+	private static final String DELETE_TAREA_MANTENIMIENTO_JARDINEROS = 
+			"DELETE FROM TareaMantenimientoJardinero WHERE id_tarea = ?";
 	
-	private static final String DELETE_HORARIO_PERIODICO_BY_ID = "DELETE FROM HorarioPeriodico WHERE id_horario = ?";
+	private static final String DELETE_TAREA_MANTENIMIENTO_BY_ID = 
+			"DELETE FROM TareaMantenimiento WHERE id_tarea = ?";
 	
 	private static final String DELETE_ENTREVISTA_BY_FRANJA = "DELETE FROM Entrevista WHERE id_franja = ?";
 	
@@ -316,32 +315,23 @@ public class EquipoJdbc {
 			}
 		}
 		
-		// 5. Jardinería horarios específicos (Sobreescribible)
-		try (PreparedStatement pst = con.prepareStatement(QUERY_JARDINERIA_ESPECIFICOS)) {
-			pst.setString(1, fecha.toString());
-			try (ResultSet rs = pst.executeQuery()) {
-				while (rs.next()) {
-					String det = rs.getString("nombre") + " " + rs.getString("apellido") + " (Específico)";
-					eventos.add(new EventoOcupacion(rs.getInt("id_horario"), "JARDINERIA_ESPECIFICO",
-							parseHora(rs.getString("hora_inicio")), parseHora(rs.getString("hora_fin")),
-							"Jardinería", det, true));
+		// 5. Tareas de jardinería reales creadas en VentanaAsignarMantenimiento (Sobreescribible)
+				try (PreparedStatement pst = con.prepareStatement(QUERY_TAREAS_MANTENIMIENTO_INSTALACION)) {
+					pst.setInt(1, idInstalacion);
+					pst.setString(2, fecha.toString());
+					try (ResultSet rs = pst.executeQuery()) {
+						while (rs.next()) {
+							String jardineros = rs.getString("jardineros");
+							String desc = rs.getString("descripcion");
+							String det = (jardineros != null && !jardineros.isBlank())
+									? jardineros + " (" + desc + ")"
+									: desc;
+							eventos.add(new EventoOcupacion(rs.getInt("id_tarea"), "TAREA_MANTENIMIENTO",
+									parseHora(rs.getString("hora_inicio")), parseHora(rs.getString("hora_fin")),
+									"Jardinería", det, true));
+						}
+					}
 				}
-			}
-		}
-		
-		// 6. Jardinería horarios periódicos (Sobreescribible)
-		try (PreparedStatement pst = con.prepareStatement(QUERY_JARDINERIA_PERIODICOS)) {
-			pst.setInt(1, fecha.getDayOfWeek().getValue());
-			pst.setString(2, fecha.toString());
-			try (ResultSet rs = pst.executeQuery()) {
-				while (rs.next()) {
-					String det = rs.getString("nombre") + " " + rs.getString("apellido") + " (Periódico)";
-					eventos.add(new EventoOcupacion(rs.getInt("id_horario"), "JARDINERIA_PERIODICO",
-							parseHora(rs.getString("hora_inicio")), parseHora(rs.getString("hora_fin")),
-							"Jardinería", det, true));
-				}
-			}
-		}
 		
 		eventos.sort(Comparator.comparing(EventoOcupacion::getHoraInicio));
 		return eventos;
@@ -401,13 +391,12 @@ public class EquipoJdbc {
 							pst.setInt(1, e.getIdReferencia());
 							pst.executeUpdate();
 						}
-					} else if ("JARDINERIA_ESPECIFICO".equals(e.getOrigen())) {
-						try (PreparedStatement pst = con.prepareStatement(DELETE_HORARIO_ESPECIFICO_BY_ID)) {
+					} 	else if ("TAREA_MANTENIMIENTO".equals(e.getOrigen())) {
+						try (PreparedStatement pst = con.prepareStatement(DELETE_TAREA_MANTENIMIENTO_JARDINEROS)) {
 							pst.setInt(1, e.getIdReferencia());
 							pst.executeUpdate();
 						}
-					} else if ("JARDINERIA_PERIODICO".equals(e.getOrigen())) {
-						try (PreparedStatement pst = con.prepareStatement(DELETE_HORARIO_PERIODICO_BY_ID)) {
+						try (PreparedStatement pst = con.prepareStatement(DELETE_TAREA_MANTENIMIENTO_BY_ID)) {
 							pst.setInt(1, e.getIdReferencia());
 							pst.executeUpdate();
 						}

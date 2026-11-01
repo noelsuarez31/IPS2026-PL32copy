@@ -27,6 +27,7 @@ import giis.demo.ui.entrevistas.VentanaCrearFranjas;
 import giis.demo.model.horarios.GestionHorarioSemanal;
 import giis.demo.ui.horarios.VentanaHorarioSemanal;
 import giis.demo.ui.mantenimiento.VentanaAsignarMantenimiento;
+import giis.demo.ui.accion.VentanaPortalAccionista;
 
 import java.awt.Color;
 import javax.swing.JMenuBar;
@@ -70,6 +71,8 @@ public class VentanaPrincipal extends JFrame {
 	private JMenu mnDirectorDeComunicaciones;
 	private JMenuItem mntmAsignarEntrevistas;
 	private JMenu mnAbonado;
+	private JMenu mnAccionista;
+	private JMenuItem mntmPortalAccionista;
 	private JMenuItem mntmComprarAbono;
 	private JMenuItem mntmAñadirMantenimiento;
 
@@ -113,6 +116,7 @@ public class VentanaPrincipal extends JFrame {
 		if (menuBar == null) {
 			menuBar = new JMenuBar();
 			menuBar.add(getMnAbonado());
+			menuBar.add(getMnAccionista());
 			menuBar.add(getMnDirectorDeComunicaciones());
 			menuBar.add(getMnEmpleado());
 			menuBar.add(getMnEntrenador());
@@ -522,5 +526,32 @@ public class VentanaPrincipal extends JFrame {
 		this.setVisible(false);
 		vAsignarMantenimiento.setVisible(true);
 		
+	}
+
+	private JMenu getMnAccionista() {
+		if (mnAccionista == null) {
+			mnAccionista = new JMenu("Accionista");
+			mnAccionista.setMnemonic('C');
+			mnAccionista.add(getMntmPortalAccionista());
+		}
+		return mnAccionista;
+	}
+
+	private JMenuItem getMntmPortalAccionista() {
+		if (mntmPortalAccionista == null) {
+			mntmPortalAccionista = new JMenuItem("Portal del accionista");
+			mntmPortalAccionista.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaPortalAccionista();
+				}
+			});
+		}
+		return mntmPortalAccionista;
+	}
+
+	private void abrirVentanaPortalAccionista() {
+		VentanaPortalAccionista vpa = new VentanaPortalAccionista(this);
+		this.setVisible(false);
+		vpa.setVisible(true);
 	}
 }

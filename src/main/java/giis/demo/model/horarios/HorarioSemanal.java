@@ -24,7 +24,7 @@ public class HorarioSemanal {
 	public int getDiaSemanaNum() {
 		return diaSemanaNum;
 	}
-
+	
 	public String getNombreDia() {
 		return nombreDia;
 	}

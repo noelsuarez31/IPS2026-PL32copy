@@ -26,6 +26,9 @@ public class ComprobarDisponibilidadJdbc {
 
 	private static final String QUERY_RESERVAS = "SELECT hora_inicio, hora_fin From Reserva "
 			+ "WHERE id_instalacion=? AND fecha = ?";
+	
+	private static final String QUERY_TAREAS_MANTENIMIENTO = "SELECT hora_inicio, hora_fin FROM TareaMantenimiento "
+			+ "WHERE id_instalacion = ? AND fecha = ?";
 
 	private static final String QUERY_CHECK_TEAM_IS_LOCAL = "SELECT es_propio FROM Equipo WHERE id_equipo = ?";
 
@@ -153,6 +156,7 @@ public class ComprobarDisponibilidadJdbc {
 		cargarIntervalos(con, QUERY_ENTRENAMIENTOS, idInstalacion, fecha, ocupados, true, false);
 		cargarIntervalos(con, QUERY_PARTIDOS, idInstalacion, fecha, ocupados, false, true);
 		cargarIntervalos(con, QUERY_RESERVAS, idInstalacion, fecha, ocupados, false, false);
+		cargarIntervalosMantenimiento(con, idInstalacion, fecha, ocupados);
 
 		ocupados.sort(Comparator.comparing(Intervalo::getHoraInicio));
 		return ocupados;
@@ -254,6 +258,25 @@ public class ComprobarDisponibilidadJdbc {
 
 		}
 
+	}
+	
+	private static void cargarIntervalosMantenimiento(Connection con, int idInstalacion, LocalDate fecha,
+			List<Intervalo> ocupados) throws SQLException {
+		try (PreparedStatement ps = con.prepareStatement(QUERY_TAREAS_MANTENIMIENTO)) {
+			ps.setInt(1, idInstalacion);
+			ps.setString(2, fecha.toString());
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					LocalTime inicio = LocalTime.parse(rs.getString("hora_inicio"));
+					LocalTime fin = LocalTime.parse(rs.getString("hora_fin"));
+					LocalTime inicioReal = inicio.isBefore(APERTURA) ? APERTURA : inicio;
+					LocalTime finReal = fin.isAfter(CIERRE) ? CIERRE : fin;
+					if (inicioReal.isBefore(finReal)) {
+						ocupados.add(new Intervalo(inicioReal, finReal, "Mantenimiento"));
+					}
+				}
+			}
+		}
 	}
 
 	/**

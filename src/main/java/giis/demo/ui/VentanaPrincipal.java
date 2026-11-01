@@ -4,19 +4,19 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import giis.demo.model.contrataciones.GestorEmpleados;
 import giis.demo.model.entrevistas.CrearEntrevistaService;
 import giis.demo.model.entrevistas.CrearFranjaService;
 import giis.demo.model.equipo.AñadirEquipoService;
-import giis.demo.model.equipo.CrearEntrenamientoService;
 import giis.demo.model.historial.HistorialVentas;
 import giis.demo.model.horarios.GestionHorarioSemanal;
 import giis.demo.model.horarios.GestionHorariosEspecificos;
@@ -29,11 +29,11 @@ import giis.demo.ui.entradas.VentanaVentaEntradas;
 import giis.demo.ui.entrevistas.VentanaCrearEntrevistas;
 import giis.demo.ui.entrevistas.VentanaCrearFranjas;
 import giis.demo.ui.equipo.VentanaAñadirEquipo;
-import giis.demo.ui.equipo.VentanaCrearEntrenamiento;
 import giis.demo.ui.historial.VentanaHistorialVentas;
 import giis.demo.ui.horarios.VentanaHorarioEspecifico;
 import giis.demo.ui.horarios.VentanaHorarioPeriodico;
 import giis.demo.ui.horarios.VentanaHorarioSemanal;
+import giis.demo.ui.mantenimiento.VentanaAsignarMantenimiento;
 import giis.demo.ui.reserva.VentanaReserva;
 import giis.demo.ui.tienda.VentanaTienda;
 
@@ -47,7 +47,6 @@ public class VentanaPrincipal extends JFrame {
 	private CrearFranjaService cfs = new CrearFranjaService();
 	private CrearEntrevistaService ces = new CrearEntrevistaService();
 	private GestorEmpleados gestorEmpleados = new GestorEmpleados();
-	private CrearEntrenamientoService crearEntrenamientoService = new CrearEntrenamientoService();
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -72,7 +71,7 @@ public class VentanaPrincipal extends JFrame {
 	private JMenuItem mntmAsignarEntrevistas;
 	private JMenu mnAbonado;
 	private JMenuItem mntmComprarAbono;
-	private JMenuItem mntmRegistrarEntrenamientos;
+	private JMenuItem mntmAñadirMantenimiento;
 
 	/**
 	 * Create the frame.
@@ -139,7 +138,6 @@ public class VentanaPrincipal extends JFrame {
 			mnEntrenador = new JMenu("Entrenador");
 			mnEntrenador.setMnemonic('T');
 			mnEntrenador.add(getMntmCrearFranjas());
-			mnEntrenador.add(getMntmRegistrarEntrenamientos());
 		}
 		return mnEntrenador;
 	}
@@ -154,6 +152,7 @@ public class VentanaPrincipal extends JFrame {
 			mnGerente.add(getMntmAltaEmpleado());
 			mnGerente.add(getMntmGestionEmpleados());
 			mnGerente.add(getMntmHistorialVentas());
+			mnGerente.add(getMntmAñadirMantenimiento());
 		}
 		return mnGerente;
 	}
@@ -162,6 +161,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmHistorialVentas == null) {
 			mntmHistorialVentas = new JMenuItem("Historial de ventas");
 			mntmHistorialVentas.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaHistorialVentas();
 				}
@@ -180,6 +180,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAltaEmpleado == null) {
 			mntmAltaEmpleado = new JMenuItem("Alta de empleado");
 			mntmAltaEmpleado.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAltaEmpleado();
 				}
@@ -204,6 +205,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmGestionEmpleados == null) {
 			mntmGestionEmpleados = new JMenuItem("Modificar / eliminar empleados");
 			mntmGestionEmpleados.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaGestionEmpleados();
 				}
@@ -231,6 +233,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mniVender == null) {
 			mniVender = new JMenuItem("Venta de entradas");
 			mniVender.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 
 					try {
@@ -311,6 +314,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAñadirEquipo == null) {
 			mntmAñadirEquipo = new JMenuItem("Añadir equipo");
 			mntmAñadirEquipo.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAñadirEquipo();
 				}
@@ -330,6 +334,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAñadirHorarioPeriodico == null) {
 			mntmAñadirHorarioPeriodico = new JMenuItem("Añadir horario periódico");
 			mntmAñadirHorarioPeriodico.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAñadirHorarioPeriodico();
 				}
@@ -349,6 +354,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAñadirHorarioEspecifico == null) {
 			mntmAñadirHorarioEspecifico = new JMenuItem("Añadir horario específico");
 			mntmAñadirHorarioEspecifico.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAñadirHorarioEspecifico();
 				}
@@ -375,6 +381,7 @@ public class VentanaPrincipal extends JFrame {
 
 			JMenuItem mntmReservaDeInstalaciones = new JMenuItem("Reserva de Instalaciones");
 			mntmReservaDeInstalaciones.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						abrirVentanaReserva();
@@ -394,6 +401,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmCrearFranjas == null) {
 			mntmCrearFranjas = new JMenuItem("Crear franjas");
 			mntmCrearFranjas.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaCrearFranjas();
 				}
@@ -436,6 +444,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAsignarEntrevistas == null) {
 			mntmAsignarEntrevistas = new JMenuItem("Asignar entrevistas");
 			mntmAsignarEntrevistas.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaCrearEntrevistas();
 				}
@@ -458,6 +467,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmVisualizarHorarioSemanal == null) {
 			mntmVisualizarHorarioSemanal = new JMenuItem("Consultar horarios semanales");
 			mntmVisualizarHorarioSemanal.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaHorarioSemanal();
 				}
@@ -475,7 +485,6 @@ public class VentanaPrincipal extends JFrame {
 	public GestionHorarioSemanal getGestionHorarioSemanal() {
 		return this.ghs;
 	}
-	
 	private JMenu getMnAbonado() {
 		if (mnAbonado == null) {
 			mnAbonado = new JMenu("Abonado");
@@ -488,6 +497,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmComprarAbono == null) {
 			mntmComprarAbono = new JMenuItem("Comprar abono");
 			mntmComprarAbono.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					
 					abrirVentaAbono();
@@ -505,26 +515,26 @@ public class VentanaPrincipal extends JFrame {
 		this.setVisible(false);
 		va.setVisible(true);
 	}
-	
-	private JMenuItem getMntmRegistrarEntrenamientos() {
-		if (mntmRegistrarEntrenamientos == null) {
-			mntmRegistrarEntrenamientos = new JMenuItem("Registrar entrenamiento");
-			mntmRegistrarEntrenamientos.addActionListener(new ActionListener() {
+
+	private JMenuItem getMntmAñadirMantenimiento() {
+		if (mntmAñadirMantenimiento == null) {
+			mntmAñadirMantenimiento = new JMenuItem("Añadir servicio de mantenimiento");
+			mntmAñadirMantenimiento.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
-					crearVentanaEntrenamiento();
+					abrirVentanaAñadirMantenimiento();
 				}
+
+				
 			});
 		}
-		return mntmRegistrarEntrenamientos;
-	}
-
-	private void crearVentanaEntrenamiento() {
-		VentanaCrearEntrenamiento vCrearEntrenamiento = new VentanaCrearEntrenamiento(this);
-		this.setVisible(false);
-		vCrearEntrenamiento.setVisible(true);
+		return mntmAñadirMantenimiento;
 	}
 	
-	public CrearEntrenamientoService getCrearEntrenamientoService() {
-		return this.crearEntrenamientoService;
+	private void abrirVentanaAñadirMantenimiento() {
+		VentanaAsignarMantenimiento vAsignarMantenimiento = new VentanaAsignarMantenimiento(this);
+		this.setVisible(false);
+		vAsignarMantenimiento.setVisible(true);
+		
 	}
 }

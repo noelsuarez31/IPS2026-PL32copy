@@ -35,8 +35,10 @@ import giis.demo.ui.historial.VentanaHistorialVentas;
 import giis.demo.ui.horarios.VentanaHorarioEspecifico;
 import giis.demo.ui.horarios.VentanaHorarioPeriodico;
 import giis.demo.ui.horarios.VentanaHorarioSemanal;
+import giis.demo.ui.mantenimiento.VentanaAsignarMantenimiento;
 import giis.demo.ui.reserva.VentanaReserva;
 import giis.demo.ui.tienda.VentanaTienda;
+
 
 public class VentanaPrincipal extends JFrame {
 
@@ -73,6 +75,7 @@ public class VentanaPrincipal extends JFrame {
 	private JMenuItem mntmAsignarEntrevistas;
 	private JMenu mnAbonado;
 	private JMenuItem mntmComprarAbono;
+	private JMenuItem mntmAñadirMantenimiento;
 	private JMenuItem mntmAñadirPartido;
 
 	/**
@@ -154,6 +157,7 @@ public class VentanaPrincipal extends JFrame {
 			mnGerente.add(getMntmAltaEmpleado());
 			mnGerente.add(getMntmGestionEmpleados());
 			mnGerente.add(getMntmHistorialVentas());
+			mnGerente.add(getMntmAñadirMantenimiento());
 			mnGerente.add(getMntmPlanificarPartido());
 		}
 		return mnGerente;
@@ -163,6 +167,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmHistorialVentas == null) {
 			mntmHistorialVentas = new JMenuItem("Historial de ventas");
 			mntmHistorialVentas.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaHistorialVentas();
 				}
@@ -181,6 +186,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAltaEmpleado == null) {
 			mntmAltaEmpleado = new JMenuItem("Alta de empleado");
 			mntmAltaEmpleado.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAltaEmpleado();
 				}
@@ -205,6 +211,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmGestionEmpleados == null) {
 			mntmGestionEmpleados = new JMenuItem("Modificar / eliminar empleados");
 			mntmGestionEmpleados.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaGestionEmpleados();
 				}
@@ -232,6 +239,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mniVender == null) {
 			mniVender = new JMenuItem("Venta de entradas");
 			mniVender.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 
 					try {
@@ -312,6 +320,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAñadirEquipo == null) {
 			mntmAñadirEquipo = new JMenuItem("Añadir equipo");
 			mntmAñadirEquipo.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAñadirEquipo();
 				}
@@ -331,6 +340,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAñadirHorarioPeriodico == null) {
 			mntmAñadirHorarioPeriodico = new JMenuItem("Añadir horario periódico");
 			mntmAñadirHorarioPeriodico.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAñadirHorarioPeriodico();
 				}
@@ -350,6 +360,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAñadirHorarioEspecifico == null) {
 			mntmAñadirHorarioEspecifico = new JMenuItem("Añadir horario específico");
 			mntmAñadirHorarioEspecifico.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaAñadirHorarioEspecifico();
 				}
@@ -376,6 +387,7 @@ public class VentanaPrincipal extends JFrame {
 
 			JMenuItem mntmReservaDeInstalaciones = new JMenuItem("Reserva de Instalaciones");
 			mntmReservaDeInstalaciones.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						abrirVentanaReserva();
@@ -395,6 +407,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmCrearFranjas == null) {
 			mntmCrearFranjas = new JMenuItem("Crear franjas");
 			mntmCrearFranjas.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaCrearFranjas();
 				}
@@ -437,6 +450,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmAsignarEntrevistas == null) {
 			mntmAsignarEntrevistas = new JMenuItem("Asignar entrevistas");
 			mntmAsignarEntrevistas.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaCrearEntrevistas();
 				}
@@ -459,6 +473,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmVisualizarHorarioSemanal == null) {
 			mntmVisualizarHorarioSemanal = new JMenuItem("Consultar horarios semanales");
 			mntmVisualizarHorarioSemanal.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaHorarioSemanal();
 				}
@@ -488,6 +503,7 @@ public class VentanaPrincipal extends JFrame {
 		if (mntmComprarAbono == null) {
 			mntmComprarAbono = new JMenuItem("Comprar abono");
 			mntmComprarAbono.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					
 					abrirVentaAbono();
@@ -505,10 +521,32 @@ public class VentanaPrincipal extends JFrame {
 		this.setVisible(false);
 		va.setVisible(true);
 	}
+	private JMenuItem getMntmAñadirMantenimiento() {
+		if (mntmAñadirMantenimiento == null) {
+			mntmAñadirMantenimiento = new JMenuItem("Añadir servicio de mantenimiento");
+			mntmAñadirMantenimiento.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaAñadirMantenimiento();
+				}
+
+				
+			});
+		}
+		return mntmAñadirMantenimiento;
+	}
+	
+	private void abrirVentanaAñadirMantenimiento() {
+		VentanaAsignarMantenimiento vAsignarMantenimiento = new VentanaAsignarMantenimiento(this);
+		this.setVisible(false);
+		vAsignarMantenimiento.setVisible(true);
+	}
+		
 	private JMenuItem getMntmPlanificarPartido() {
 		if (mntmAñadirPartido == null) {
 			mntmAñadirPartido = new JMenuItem("Planificar partido");
 			mntmAñadirPartido.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					gestionPlanificarPartido();
 				}

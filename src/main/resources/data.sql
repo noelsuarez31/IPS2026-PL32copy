@@ -24,6 +24,8 @@ delete from Instalacion;
 
 delete from Abono;
 delete from Abonado;
+delete from TareaMantenimientoJardinero;
+delete from TareaMantenimiento;
 
 INSERT INTO "Producto" ("nombre", "tipo", "precio") VALUES 
 ('Sudadera', 'ParteArriba', 65.00),
@@ -324,6 +326,37 @@ INSERT INTO "EmpleadoNoDeportivo" ("dni", "posicion") VALUES ('70707070G', 'COCI
 INSERT INTO "EmpleadoNoDeportivo" ("dni", "posicion") VALUES ('70707070H', 'DIRECTOR_DE_COMUNICACIONES');
 INSERT INTO "EmpleadoNoDeportivo" ("dni", "posicion") VALUES ('70707070I', 'VENDEDOR_DE_ENTRADAS');
 INSERT INTO "EmpleadoNoDeportivo" ("dni", "posicion") VALUES ('70707070J', 'EMPLEADO_DE_TIENDA');
+
+-- Nuevos jardineros para pruebas de HU 4
+INSERT INTO "BaseEmpleado" ("dni", "nombre", "apellido", "salario", "fecha_nacimiento", "numero_de_telefono") 
+VALUES ('70707070K', 'Marcos', 'Vega', 21500.00, '1992-04-10', '700000222');
+INSERT INTO "BaseEmpleado" ("dni", "nombre", "apellido", "salario", "fecha_nacimiento", "numero_de_telefono") 
+VALUES ('70707070L', 'Lucía', 'Molina', 21000.00, '1995-11-20', '700000333');
+
+INSERT INTO "EmpleadoNoDeportivo" ("dni", "posicion") VALUES ('70707070K', 'JARDINERIA');
+INSERT INTO "EmpleadoNoDeportivo" ("dni", "posicion") VALUES ('70707070L', 'JARDINERIA');
+
+-- Horarios periódicos para jardineros (pruebas rápidas de mantenimiento)
+-- Elena Pérez (70707070F): Lunes a viernes, 08:00 a 16:00
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070F', 1, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070F', 2, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070F', 3, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070F', 4, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070F', 5, '08:00', '16:00');
+
+-- Marcos Vega (70707070K): Lunes a viernes, 08:00 a 16:00
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070K', 1, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070K', 2, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070K', 3, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070K', 4, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070K', 5, '08:00', '16:00');
+
+-- Lucía Molina (70707070L): Lunes a viernes, 08:00 a 16:00
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070L', 1, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070L', 2, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070L', 3, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070L', 4, '08:00', '16:00');
+INSERT INTO "HorarioPeriodico" ("dni_empleado", "dia_semana", "hora_inicio", "hora_fin") VALUES ('70707070L', 5, '08:00', '16:00');
 
 insert into Equipo (nombre, es_propio, tipo_equipo, id_categoria) values ('Real Oviedo', 1, 'Profesional', (select id_categoria from CategoriaEquipo where nombre = 'Primer equipo'));
 insert into Equipo (nombre, es_propio, tipo_equipo, id_categoria) values ('Real Oviedo B', 1, 'Profesional', (select id_categoria from CategoriaEquipo where nombre = 'Primer equipo'));

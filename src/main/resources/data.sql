@@ -862,3 +862,10 @@ VALUES ((SELECT MAX(id_franja) FROM FranjaHoraria WHERE fecha = '2026-11-20' AND
 -- 5. Partido previo ya programado en el estadio -> NO SOBREESCRIBIBLE (Colisión bloqueante)
 INSERT INTO "Partido" ("fecha", "hora_inicio", "hora_fin", "id_local", "id_visitante", "id_instalacion", "dia_del_club", "precio_abonado") 
 VALUES ('2026-11-20', '18:00', '20:00', 1, 4, 1, 0, 0.0);
+
+-- Asignar entrenador y jugadores a Real Oviedo (id_equipo = 3)
+UPDATE "EmpleadoDeportivo" SET "id_equipo" = 3 WHERE "dni" = '33333333C';
+UPDATE "EmpleadoDeportivo" SET "id_equipo" = 3 WHERE "dni" IN ('22222222B', '77777777G', '88888888H', '99999999I', '12345678J', '87654321K', '11223344L', '55667788M', '99887766N');
+-- Asignar entrenador y jugadores a Real Oviedo B (id_equipo = 4)
+UPDATE "EmpleadoDeportivo" SET "id_equipo" = 4 WHERE "dni" = '66666666F';
+UPDATE "EmpleadoDeportivo" SET "id_equipo" = 4 WHERE "dni" IN ('33445566O', '77889900P', '50505050A', '50505050B', '50505050C', '50505050D', '50505050E', '50505050F');

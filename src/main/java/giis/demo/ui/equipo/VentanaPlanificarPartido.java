@@ -41,7 +41,9 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
 import com.toedter.calendar.JDateChooser;
+
 import giis.demo.model.entradas.enumerados.TipoSeccion;
 import giis.demo.model.equipo.Equipo;
 import giis.demo.model.equipo.EventoOcupacion;
@@ -49,10 +51,6 @@ import giis.demo.model.equipo.PlanificarPartidoService;
 import giis.demo.model.reserva.Instalacion;
 import giis.demo.ui.VentanaPrincipal;
 
-/**
- * Ventana para dar de alta partidos de los equipos del club (HU-35797).
- * Coherente con crear entrenamiento: ¿Sobreescribible? (Sí en verde / No en rojo).
- */
 public class VentanaPlanificarPartido extends JFrame {
 
 	private static final long serialVersionUID = 1L;

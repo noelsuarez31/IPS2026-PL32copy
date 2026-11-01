@@ -44,6 +44,7 @@ import giis.demo.model.entradas.enumerados.TipoTribuna;
 import giis.demo.model.entrevistas.FranjaHoraria;
 import giis.demo.model.equipo.CategoriaEquipo;
 import giis.demo.model.equipo.Equipo;
+import giis.demo.model.equipo.EventoOcupacion;
 import giis.demo.model.historial.Ingreso;
 import giis.demo.model.historial.LineaDetalle;
 import giis.demo.model.horarios.HorarioEspecifico;
@@ -54,7 +55,6 @@ import giis.demo.model.reserva.Intervalo;
 import giis.demo.model.reserva.Reserva;
 import giis.demo.model.reserva.Usuario;
 import giis.demo.model.tienda.Producto;
-import giis.demo.model.equipo.EventoOcupacion;
 
 public class JDBC {
 
@@ -800,6 +800,7 @@ public class JDBC {
 			throws SQLException {
 		EquipoJdbc.comprobarColisionesPartido(con, fecha, horaInicio, horaFin, idInstalacion);
 	}
+	
 	/**
 	 * Obtiene los eventos sobreescribibles de menor prioridad que se solapan con el horario del partido.
 	 */
@@ -807,6 +808,7 @@ public class JDBC {
 			LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) throws SQLException {
 		return EquipoJdbc.obtenerSobreescribiblesPartidoSolapados(con, idInstalacion, fecha, horaInicio, horaFin);
 	}
+	
 	/**
 	 * Registra el partido, sus precios de sección y cancela atómicamente los eventos sobreescritos.
 	 */
@@ -817,6 +819,7 @@ public class JDBC {
 		EquipoJdbc.guardarPartidoCancelandoCoincidentes(con, idLocal, idVisitante, idInstalacion, fecha, horaInicio,
 				horaFin, esDiaClub, precioAbonado, preciosSeccion, cancelables);
 	}
+	
 	/**
 	 * Obtiene todos los eventos de ocupación para la fecha e instalación (para rellenar la tabla de la UI).
 	 */

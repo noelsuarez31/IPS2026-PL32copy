@@ -211,6 +211,12 @@ public class EquipoJdbc {
 		}
 	}
 
+	/**
+	 * Devuelve una lista de equipos de la organizacion
+	 * @param con
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<Equipo> getEquiposPropios(Connection con) throws SQLException {
 
 		List<Equipo> equipos = new ArrayList<Equipo>();
@@ -372,8 +378,23 @@ public class EquipoJdbc {
 		}
 		return solapados;
 	}
+	
 	/**
-	 * 3. Transacción atómica: Cancela eventos coincidentes, registra el partido y almacena los precios por sección.
+	 * Guarda el partido escogido eliminando los eventos
+	 * de ocupacion coincidentes
+	 * de forma atomica
+	 * @param con
+	 * @param idLocal
+	 * @param idVisitante
+	 * @param idInstalacion
+	 * @param fecha
+	 * @param horaInicio
+	 * @param horaFin
+	 * @param esDiaClub
+	 * @param precioAbonado
+	 * @param preciosSeccion
+	 * @param cancelables
+	 * @throws SQLException
 	 */
 	public static void guardarPartidoCancelandoCoincidentes(Connection con, int idLocal, int idVisitante,
 			int idInstalacion, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin,
@@ -417,6 +438,7 @@ public class EquipoJdbc {
 					}
 				}
 			}
+			
 			// B. Insertar el Partido y recuperar su id generado
 			int idPartidoGenerado;
 			try (PreparedStatement pst = con.prepareStatement(QUERY_INSERT_PARTIDO, Statement.RETURN_GENERATED_KEYS)) {
@@ -465,6 +487,8 @@ public class EquipoJdbc {
 			con.setAutoCommit(autoCommitOriginal);
 		}
 	}
+	
+	
 	private static LocalTime parseHora(String hStr) {
 		if (hStr == null || hStr.isBlank()) {
 			return LocalTime.MIDNIGHT;

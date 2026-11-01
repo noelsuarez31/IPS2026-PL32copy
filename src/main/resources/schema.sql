@@ -28,6 +28,9 @@ drop table if exists Abonado;
 drop table if exists Abono;
 drop table if exists PrecioSeccion;
 
+drop table if exists TareaMantenimientoJardinero;
+drop table if exists TareaMantenimiento;
+
 CREATE TABLE IF NOT EXISTS "butaca" (
 	"id_butaca"	INTEGER,
 	"tribuna"	TEXT NOT NULL CHECK("tribuna" IN ('A', 'B', 'C', 'D')),
@@ -245,4 +248,23 @@ CREATE TABLE IF NOT EXISTS "Abono" (
 	FOREIGN KEY("id_abonado") REFERENCES "Abonado"("id_abonado"),
 	FOREIGN KEY("id_equipo") REFERENCES "Equipo"("id_equipo"),
 	FOREIGN KEY("id_butaca") REFERENCES "Butaca"("id_butaca")
+);
+
+CREATE TABLE IF NOT EXISTS "TareaMantenimiento" (
+	"id_tarea" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"id_instalacion" INTEGER NOT NULL,
+	"fecha" DATE NOT NULL,
+	"hora_inicio" TEXT NOT NULL,
+	"hora_fin" TEXT NOT NULL,
+	"descripcion" TEXT DEFAULT 'Mantenimiento de jardinería',
+	FOREIGN KEY("id_instalacion") REFERENCES "Instalacion"("id_instalacion") ON DELETE CASCADE,
+	CHECK("hora_inicio" < "hora_fin")
+);
+
+CREATE TABLE IF NOT EXISTS "TareaMantenimientoJardinero" (
+	"id_tarea" INTEGER NOT NULL,
+	"dni_jardinero" TEXT NOT NULL,
+	PRIMARY KEY("id_tarea", "dni_jardinero"),
+	FOREIGN KEY("id_tarea") REFERENCES "TareaMantenimiento"("id_tarea") ON DELETE CASCADE,
+	FOREIGN KEY("dni_jardinero") REFERENCES "EmpleadoNoDeportivo"("dni") ON DELETE CASCADE ON UPDATE CASCADE
 );

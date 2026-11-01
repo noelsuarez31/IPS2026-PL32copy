@@ -643,7 +643,7 @@ public class VentanaAbono extends JFrame {
 
 			@Override
 			protected Void doInBackground() throws Exception {
-				new ServicioEmail().enviar(destinatario, "Confirmación de abono de temporada", cuerpo);
+				//new ServicioEmail().enviar(destinatario, "Confirmación de abono de temporada", cuerpo);
 				return null;
 			}
 
@@ -970,8 +970,9 @@ public class VentanaAbono extends JFrame {
 
 		String correo = getTfEmail().getText();
 
-		if (!ValidadorEmail.esValido(correo)) {
+		//if (!ValidadorEmail.esValido(correo)) {
 			
+		if(correo.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "El formato del email debe ser xxxx@xx.xxx");
 			
 			getTfEmail().requestFocus();

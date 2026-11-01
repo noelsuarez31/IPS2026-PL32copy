@@ -26,6 +26,7 @@ import giis.demo.ui.entrevistas.VentanaCrearEntrevistas;
 import giis.demo.ui.entrevistas.VentanaCrearFranjas;
 import giis.demo.model.horarios.GestionHorarioSemanal;
 import giis.demo.ui.horarios.VentanaHorarioSemanal;
+import giis.demo.ui.mantenimiento.VentanaAsignarMantenimiento;
 
 import java.awt.Color;
 import javax.swing.JMenuBar;
@@ -35,7 +36,6 @@ import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -71,6 +71,7 @@ public class VentanaPrincipal extends JFrame {
 	private JMenuItem mntmAsignarEntrevistas;
 	private JMenu mnAbonado;
 	private JMenuItem mntmComprarAbono;
+	private JMenuItem mntmAñadirMantenimiento;
 
 	/**
 	 * Create the frame.
@@ -151,6 +152,7 @@ public class VentanaPrincipal extends JFrame {
 			mnGerente.add(getMntmAltaEmpleado());
 			mnGerente.add(getMntmGestionEmpleados());
 			mnGerente.add(getMntmHistorialVentas());
+			mnGerente.add(getMntmAñadirMantenimiento());
 		}
 		return mnGerente;
 	}
@@ -500,5 +502,25 @@ public class VentanaPrincipal extends JFrame {
 		VentanaAbono va = new VentanaAbono(this);
 		this.setVisible(false);
 		va.setVisible(true);
+	}
+	private JMenuItem getMntmAñadirMantenimiento() {
+		if (mntmAñadirMantenimiento == null) {
+			mntmAñadirMantenimiento = new JMenuItem("Añadir servicio de mantenimiento");
+			mntmAñadirMantenimiento.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaAñadirMantenimiento();
+				}
+
+				
+			});
+		}
+		return mntmAñadirMantenimiento;
+	}
+	
+	private void abrirVentanaAñadirMantenimiento() {
+		VentanaAsignarMantenimiento vAsignarMantenimiento = new VentanaAsignarMantenimiento(this);
+		this.setVisible(false);
+		vAsignarMantenimiento.setVisible(true);
+		
 	}
 }

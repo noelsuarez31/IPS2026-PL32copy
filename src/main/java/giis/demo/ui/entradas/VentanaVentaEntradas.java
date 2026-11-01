@@ -577,7 +577,7 @@ public class VentanaVentaEntradas extends JFrame {
 
 			@Override
 			protected Void doInBackground() throws Exception {
-				new ServicioEmail().enviar(destinatario, "Confirmación de compra de entradas", cuerpo);
+				//new ServicioEmail().enviar(destinatario, "Confirmación de compra de entradas", cuerpo);
 				return null;
 			}
 
@@ -888,9 +888,13 @@ public class VentanaVentaEntradas extends JFrame {
 		return btConfirma;
 	}
 
+	
 	private boolean comprobarEmail() {
 
-		if (!ValidadorEmail.esValido(getTfEmail().getText())) {
+		//if (!ValidadorEmail.esValido(getTfEmail().getText())) {
+			
+			if (getTfEmail().getText().isEmpty()) {
+
 
 			JOptionPane.showMessageDialog(this, "El formato del email debe ser xxxx@xx.xxx", "Email no válido",
 					JOptionPane.WARNING_MESSAGE);

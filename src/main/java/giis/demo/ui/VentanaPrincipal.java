@@ -1,14 +1,25 @@
 package giis.demo.ui;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import giis.demo.ui.tienda.VentanaTienda;
 import giis.demo.model.contrataciones.GestorEmpleados;
+import giis.demo.model.entrevistas.CrearEntrevistaService;
 import giis.demo.model.entrevistas.CrearFranjaService;
 import giis.demo.model.equipo.AñadirEquipoService;
+import giis.demo.model.equipo.PlanificarPartidoService;
 import giis.demo.model.historial.HistorialVentas;
+import giis.demo.model.horarios.GestionHorarioSemanal;
 import giis.demo.model.horarios.GestionHorariosEspecificos;
 import giis.demo.model.horarios.GestionHorariosPeriodicos;
 import giis.demo.model.tienda.VentaMerchandising;
@@ -16,26 +27,16 @@ import giis.demo.ui.abonos.VentanaAbono;
 import giis.demo.ui.contrataciones.VentanaAltaEmpleado;
 import giis.demo.ui.contrataciones.VentanaGestionEmpleados;
 import giis.demo.ui.entradas.VentanaVentaEntradas;
-import giis.demo.ui.equipo.VentanaAñadirEquipo;
-import giis.demo.ui.historial.VentanaHistorialVentas;
-import giis.demo.ui.horarios.VentanaHorarioPeriodico;
-import giis.demo.ui.horarios.VentanaHorarioEspecifico;
-import giis.demo.ui.reserva.VentanaReserva;
-import giis.demo.model.entrevistas.CrearEntrevistaService;
 import giis.demo.ui.entrevistas.VentanaCrearEntrevistas;
 import giis.demo.ui.entrevistas.VentanaCrearFranjas;
-import giis.demo.model.horarios.GestionHorarioSemanal;
+import giis.demo.ui.equipo.VentanaAñadirEquipo;
+import giis.demo.ui.equipo.VentanaPlanificarPartido;
+import giis.demo.ui.historial.VentanaHistorialVentas;
+import giis.demo.ui.horarios.VentanaHorarioEspecifico;
+import giis.demo.ui.horarios.VentanaHorarioPeriodico;
 import giis.demo.ui.horarios.VentanaHorarioSemanal;
-
-import java.awt.Color;
-import javax.swing.JMenuBar;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import java.awt.event.ActionListener;
-import java.sql.SQLException;
-import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
+import giis.demo.ui.reserva.VentanaReserva;
+import giis.demo.ui.tienda.VentanaTienda;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -47,6 +48,7 @@ public class VentanaPrincipal extends JFrame {
 	private CrearFranjaService cfs = new CrearFranjaService();
 	private CrearEntrevistaService ces = new CrearEntrevistaService();
 	private GestorEmpleados gestorEmpleados = new GestorEmpleados();
+	private PlanificarPartidoService pps = new PlanificarPartidoService();
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -71,6 +73,7 @@ public class VentanaPrincipal extends JFrame {
 	private JMenuItem mntmAsignarEntrevistas;
 	private JMenu mnAbonado;
 	private JMenuItem mntmComprarAbono;
+	private JMenuItem mntmAñadirPartido;
 
 	/**
 	 * Create the frame.
@@ -151,6 +154,7 @@ public class VentanaPrincipal extends JFrame {
 			mnGerente.add(getMntmAltaEmpleado());
 			mnGerente.add(getMntmGestionEmpleados());
 			mnGerente.add(getMntmHistorialVentas());
+			mnGerente.add(getMntmPlanificarPartido());
 		}
 		return mnGerente;
 	}
@@ -500,5 +504,26 @@ public class VentanaPrincipal extends JFrame {
 		VentanaAbono va = new VentanaAbono(this);
 		this.setVisible(false);
 		va.setVisible(true);
+	}
+	private JMenuItem getMntmPlanificarPartido() {
+		if (mntmAñadirPartido == null) {
+			mntmAñadirPartido = new JMenuItem("Planificar partido");
+			mntmAñadirPartido.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					gestionPlanificarPartido();
+				}
+			});
+		}
+		return mntmAñadirPartido;
+	}
+	
+	private void gestionPlanificarPartido() {
+		VentanaPlanificarPartido vpp = new VentanaPlanificarPartido(this);
+		vpp.setVisible(true);
+		this.setVisible(false);
+	}
+	
+	public PlanificarPartidoService getPlanificarPartidoService() {
+		return this.pps;
 	}
 }

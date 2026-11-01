@@ -42,6 +42,7 @@ import giis.demo.model.entradas.enumerados.TipoTribuna;
 import giis.demo.model.entrevistas.FranjaHoraria;
 import giis.demo.model.equipo.CategoriaEquipo;
 import giis.demo.model.equipo.Equipo;
+import giis.demo.model.equipo.EventoOcupacion;
 import giis.demo.model.historial.Ingreso;
 import giis.demo.model.historial.LineaDetalle;
 import giis.demo.model.horarios.HorarioEspecifico;
@@ -729,5 +730,51 @@ public class JDBC {
 	 */
 	public List<String> obtenerPartidosYEntrenamientos(int idEquipo, LocalDate fecha) throws SQLException {
 		return FranjaJdbc.obtenerPartidosYEntrenamientos(con, idEquipo, fecha);
+	}
+
+    /**
+     * Devuelve la lista de equipos externos rivales (visitantes)
+     */
+    public List<Equipo> getEquiposVisitantes() throws SQLException {
+        return EquipoJdbc.getEquiposExternos(con);
+    }
+    
+    /**
+     * Devuelve la lista de equipos propios de la organización (locales)
+     */
+    public List<Equipo> getEquiposPropios() throws SQLException {
+        return EquipoJdbc.getEquiposPropios(con);
+    }
+    
+    /**
+	 * Comprueba colisiones de horario para un partido en la instalación y fecha.
+	 */
+	public void comprobarColisionesPartido(LocalDate fecha, LocalTime horaInicio, LocalTime horaFin, int idInstalacion)
+			throws SQLException {
+		EquipoJdbc.comprobarColisionesPartido(con, fecha, horaInicio, horaFin, idInstalacion);
+	}
+	/**
+	 * Obtiene los eventos sobreescribibles de menor prioridad que se solapan con el horario del partido.
+	 */
+	public List<EventoOcupacion> obtenerSobreescribiblesPartidoSolapados(int idInstalacion,
+			LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) throws SQLException {
+		return EquipoJdbc.obtenerSobreescribiblesPartidoSolapados(con, idInstalacion, fecha, horaInicio, horaFin);
+	}
+	/**
+	 * Registra el partido, sus precios de sección y cancela atómicamente los eventos sobreescritos.
+	 */
+	public void guardarPartidoCancelandoCoincidentes(int idLocal, int idVisitante, int idInstalacion, LocalDate fecha,
+			LocalTime horaInicio, LocalTime horaFin, boolean esDiaClub, double precioAbonado,
+			Map<TipoSeccion, Double> preciosSeccion, List<EventoOcupacion> cancelables)
+			throws SQLException {
+		EquipoJdbc.guardarPartidoCancelandoCoincidentes(con, idLocal, idVisitante, idInstalacion, fecha, horaInicio,
+				horaFin, esDiaClub, precioAbonado, preciosSeccion, cancelables);
+	}
+	/**
+	 * Obtiene todos los eventos de ocupación para la fecha e instalación (para rellenar la tabla de la UI).
+	 */
+	public List<EventoOcupacion> obtenerEventosOcupacionPartido(int idInstalacion, LocalDate fecha)
+			throws SQLException {
+		return EquipoJdbc.obtenerEventosOcupacionPartido(con, idInstalacion, fecha);
 	}
 }

@@ -212,6 +212,7 @@ public class VentaDeEntradas extends Venta{
 
 	/**
 	 * Comprueba si el asiento está reservado
+	 * 
 	 * @param id_partido
 	 * @param tipoTribuna
 	 * @param tipoSeccion
@@ -225,6 +226,60 @@ public class VentaDeEntradas extends Venta{
 
 		return butacasSeleccionadas.contains(butaca);
 
+	}
+	
+	/**
+	 * Dada una butaca seleccionada de forma manual, la añade a la lista
+	 * de bustacas seleccionadas
+	 * 
+	 * @param partido
+	 * @param tribuna
+	 * @param seccion
+	 * @param fila
+	 * @param asiento
+	 * 
+	 * @throws SinDisponibilidadException
+	 */
+	public void seleccionarAsientoManual(Partido partido, TipoTribuna tribuna, TipoSeccion seccion,
+	        int fila, int asiento) throws SinDisponibilidadException {
+
+	    this.idPartido = partido.getId_partido();
+	    
+	    Butaca butacaSeleccionada = null;
+	    
+	    for(Butaca butaca : butacasDisponibles) {
+	    	
+	    	if(butaca.getFila() == fila && butaca.getAsiento()==asiento) {
+	    		
+	    		butacaSeleccionada = butaca;
+	    		break;
+	    		
+	    	}
+	    	
+	    }
+	    
+	    if (butacaSeleccionada == null) {
+	        throw new SinDisponibilidadException(
+	                "El asiento seleccionado no está disponible");
+	    }
+
+	    butacasSeleccionadas = new ArrayList<>();
+	    butacasSeleccionadas.add(butacaSeleccionada);
+	    
+	}
+	
+	/**
+	 * Calcula el precio de un asiento para una sección y partido dados
+	 * 
+	 * @param idPrecio
+	 * @param seccion
+	 * @return el precio obtenido
+	 * @throws SQLException
+	 */
+	public double getPrecio(int idPrecio, String seccion) throws SQLException {
+		
+		return jdbc.obtenerPrecio(idPrecio, seccion);
+		
 	}
 
 }

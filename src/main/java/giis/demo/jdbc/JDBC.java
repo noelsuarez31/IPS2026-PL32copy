@@ -16,6 +16,7 @@ import giis.demo.jdbc.empleado.EmpleadoDeportivoJdbc;
 import giis.demo.jdbc.empleado.EmpleadoNoDeportivoJdbc;
 import giis.demo.jdbc.entradas.ButacaJdbc;
 import giis.demo.jdbc.entradas.PartidoJdbc;
+import giis.demo.jdbc.entradas.PrecioSeccionJdbc;
 import giis.demo.jdbc.entradas.RegistrarVentaJdbc;
 import giis.demo.jdbc.entrevistas.EntrevistaJdbc;
 import giis.demo.jdbc.entrevistas.FranjaJdbc;
@@ -732,6 +733,21 @@ public class JDBC {
 	 */
 	public List<String> obtenerPartidosYEntrenamientos(int idEquipo, LocalDate fecha) throws SQLException {
 		return FranjaJdbc.obtenerPartidosYEntrenamientos(con, idEquipo, fecha);
+	}
+	
+	
+	/**
+	 * Devuelve el precio de un asiento para un partido y una sección dadas
+	 * 
+	 * @param idPartido
+	 * @param seccion
+	 * @return el precio del asiento
+	 * @throws SQLException 
+	 */
+	public double obtenerPrecio(int idPartido, String seccion) throws SQLException {
+		
+		return PrecioSeccionJdbc.getPrecio(con, idPartido, seccion);
+		
 	}
 	
 	/**

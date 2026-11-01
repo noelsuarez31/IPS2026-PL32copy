@@ -24,6 +24,7 @@ delete from Instalacion;
 
 delete from Abono;
 delete from Abonado;
+delete from PrecioSeccion;
 delete from TareaMantenimientoJardinero;
 delete from TareaMantenimiento;
 
@@ -179,6 +180,25 @@ INSERT INTO "LineaVenta" ("id_venta", "id_producto", "unidades", "precio_unitari
 (12, (SELECT id_producto FROM Producto WHERE nombre='Taza'), 1, 12.0),
 (30, (SELECT id_producto FROM Producto WHERE nombre='Sudadera'), 1, 65.0),
 (30, (SELECT id_producto FROM Producto WHERE nombre='Gorra'), 2, 16.0);
+
+INSERT INTO "venta" VALUES (35,'2026-10-28','ENTRADAS PARA EL PARTIDO 4','ENTRADAS',80.0);
+INSERT INTO "venta" VALUES (36,'2026-10-29','ENTRADAS PARA EL PARTIDO 4','ENTRADAS',140.0);
+INSERT INTO "entrada" VALUES (103,4,35,35,40.0);
+INSERT INTO "entrada" VALUES (104,4,35,36,40.0);
+INSERT INTO "entrada" VALUES (105,4,36,166,35.0);
+INSERT INTO "entrada" VALUES (106,4,36,167,35.0);
+INSERT INTO "entrada" VALUES (107,4,36,168,35.0);
+INSERT INTO "entrada" VALUES (108,4,36,169,35.0);
+INSERT INTO "venta" VALUES (37,'2026-10-29','ENTRADAS PARA EL PARTIDO 5','ENTRADAS',135.0);
+INSERT INTO "venta" VALUES (38,'2026-10-30','ENTRADAS PARA EL PARTIDO 5','ENTRADAS',70.0);
+INSERT INTO "entrada" VALUES (109,5,37,3,45.0);
+INSERT INTO "entrada" VALUES (110,5,37,4,45.0);
+INSERT INTO "entrada" VALUES (111,5,37,5,45.0);
+INSERT INTO "entrada" VALUES (112,5,38,307,35.0);
+INSERT INTO "entrada" VALUES (113,5,38,308,35.0);
+INSERT INTO "venta" VALUES (39,'2026-10-30','ENTRADAS PARA EL PARTIDO 6','ENTRADAS',80.0);
+INSERT INTO "entrada" VALUES (114,6,39,22,40.0);
+INSERT INTO "entrada" VALUES (115,6,39,23,40.0);
 
 INSERT INTO "CategoriaEquipo" ("nombre", "edad_minima", "edad_maxima", "tipo_equipo") VALUES 
 ('Primer equipo', 19, 40, 'Profesional'),
@@ -376,11 +396,6 @@ INSERT INTO "Entrenamiento" ("fecha", "hora_inicio", "hora_fin", "id_equipo", "i
 ('2026-10-21', '16:00:00', '18:00:00', 1, 1),
 ('2026-10-27', '17:00:00', '19:00:00', 1, 1);
 
-INSERT INTO "Partido" ("fecha", "hora_inicio", "hora_fin", "id_local", "id_visitante", "id_instalacion") VALUES 
-('2026-10-21', '21:00:00', '23:00:00', 1, 2, 1),
-('2026-10-27', '18:30:00', '20:30:00', 3, 4, 2),
-('2026-10-29', '19:30:00', '22:30:00', 5, 6, 2),
-('2026-11-03', '14:30:00', '16:30:00', 7, 9, 3);
 
 insert into Instalacion (nombre) values ('Campo de fútbol 1');
 insert into Instalacion (nombre) values ('Campo de fútbol 2');
@@ -429,42 +444,6 @@ VALUES
     ('2026-10-23', 'Abono de temporada',
      'ABONOS', 250.00);
      
-INSERT INTO Abono
-    (id_venta, id_abonado, id_equipo, id_butaca,
-     fecha_inicio, fecha_fin, fecha_registro, categoria, precio)
-VALUES
-    (
-        (SELECT MAX(id_venta) - 3 FROM Venta),
-        (SELECT id_abonado FROM Abonado WHERE dni = '12345678A'),
-        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo' AND es_propio = 1 LIMIT 1),
-        (SELECT id_butaca FROM Butaca
-         WHERE tribuna = 'A' AND seccion = 'A' AND fila = 1 AND asiento = 1),
-        '2026-07-01', '2027-06-30', '2026-10-25 12:27', 'INFANTIL', 100.00
-    ),
-    (
-        (SELECT MAX(id_venta) - 2 FROM Venta),
-        (SELECT id_abonado FROM Abonado WHERE dni = '23456789B'),
-        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo' AND es_propio = 1 LIMIT 1),
-        (SELECT id_butaca FROM Butaca
-         WHERE tribuna = 'A' AND seccion = 'A' AND fila = 1 AND asiento = 2),
-        '2026-07-01', '2027-06-30', '2026-11-27 09:15', 'SUB_26', 200.00
-    ),
-    (
-        (SELECT MAX(id_venta) - 1 FROM Venta),
-        (SELECT id_abonado FROM Abonado WHERE dni = '34567890C'),
-        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo B' AND es_propio = 1 LIMIT 1),
-        (SELECT id_butaca FROM Butaca
-         WHERE tribuna = 'B' AND seccion = 'B' AND fila = 1 AND asiento = 1),
-        '2026-07-01', '2027-06-30', '2026-10-27 11:15', 'ADULTO', 400.00
-    ),
-    (
-        (SELECT MAX(id_venta) FROM Venta),
-        (SELECT id_abonado FROM Abonado WHERE dni = '45678901D'),
-        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo B' AND es_propio = 1 LIMIT 1),
-        (SELECT id_butaca FROM Butaca
-         WHERE tribuna = 'B' AND seccion = 'B' AND fila = 1 AND asiento = 2),
-        '2026-07-01', '2027-06-30','2026-10-25 09:15', 'JUBILADO', 250.00
-    );
 -- creamos jugadores para probar las distintas categorias --
 -- Juveniles --
 INSERT INTO "BaseEmpleado" ("dni", "nombre", "apellido", "salario", "fecha_nacimiento", "numero_de_telefono") VALUES
@@ -844,6 +823,63 @@ INSERT INTO "EmpleadoDeportivo" ("dni", "posicion") VALUES
 ('95000008H', 'JUGADOR'),
 ('95000009I', 'JUGADOR'),
 ('95000010J', 'JUGADOR');
+
+
+INSERT INTO "Partido" ("id_partido","fecha","hora_inicio","hora_fin","id_local","id_visitante","id_instalacion","dia_del_club","precio_abonado") VALUES
+(1,'2026-10-21','21:00:00','23:00:00',1,2,1,0,NULL),
+(2,'2026-10-27','18:30:00','20:30:00',3,4,2,0,NULL),
+(3,'2026-10-29','19:30:00','22:30:00',5,6,2,0,NULL),
+(4,'2026-11-03','14:30:00','16:30:00',2,8,3,0,NULL),
+(5,'2026-11-10','18:00:00','20:00:00',3,5,1,1,10.0),
+(6,'2026-11-17','20:00:00','22:00:00',3,6,1,0,NULL);
+
+INSERT INTO "PrecioSeccion" ("id_partido", "seccion", "precio")
+SELECT p.id_partido, s.nombre, s.base + 
+       CASE p.id_partido WHEN 2 THEN 10.0 WHEN 5 THEN 5.0 ELSE 0.0 END
+FROM Partido p,
+     (SELECT 'A' AS nombre, 40.0 AS base UNION ALL
+      SELECT 'B', 35.0 UNION ALL
+      SELECT 'C', 30.0 UNION ALL
+      SELECT 'D', 25.0 UNION ALL
+      SELECT 'E', 20.0 UNION ALL
+      SELECT 'F', 15.0) s;
+      
+INSERT INTO Abono
+    (id_venta, id_abonado, id_equipo, id_butaca,
+     fecha_inicio, fecha_fin, fecha_registro, categoria, precio)
+VALUES
+    (
+        (SELECT MAX(id_venta) - 3 FROM Venta),
+        (SELECT id_abonado FROM Abonado WHERE dni = '12345678A'),
+        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo' AND es_propio = 1 LIMIT 1),
+        (SELECT id_butaca FROM Butaca
+         WHERE tribuna = 'A' AND seccion = 'A' AND fila = 1 AND asiento = 1),
+        '2026-07-01', '2027-06-30', '2026-10-25 12:27', 'INFANTIL', 100.00
+    ),
+    (
+        (SELECT MAX(id_venta) - 2 FROM Venta),
+        (SELECT id_abonado FROM Abonado WHERE dni = '23456789B'),
+        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo' AND es_propio = 1 LIMIT 1),
+        (SELECT id_butaca FROM Butaca
+         WHERE tribuna = 'A' AND seccion = 'A' AND fila = 1 AND asiento = 2),
+        '2026-07-01', '2027-06-30', '2026-11-27 09:15', 'SUB_26', 200.00
+    ),
+    (
+        (SELECT MAX(id_venta) - 1 FROM Venta),
+        (SELECT id_abonado FROM Abonado WHERE dni = '34567890C'),
+        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo B' AND es_propio = 1 LIMIT 1),
+        (SELECT id_butaca FROM Butaca
+         WHERE tribuna = 'B' AND seccion = 'B' AND fila = 1 AND asiento = 1),
+        '2026-07-01', '2027-06-30', '2026-10-27 11:15', 'ADULTO', 400.00
+    ),
+    (
+        (SELECT MAX(id_venta) FROM Venta),
+        (SELECT id_abonado FROM Abonado WHERE dni = '45678901D'),
+        (SELECT id_equipo FROM Equipo WHERE nombre = 'Real Oviedo B' AND es_propio = 1 LIMIT 1),
+        (SELECT id_butaca FROM Butaca
+         WHERE tribuna = 'B' AND seccion = 'B' AND fila = 1 AND asiento = 2),
+        '2026-07-01', '2027-06-30','2026-10-25 09:15', 'JUBILADO', 250.00
+    );
 
 -- 1. Entrenamiento en la instalación -> NO SOBREESCRIBIBLE (Colisión bloqueante)
 INSERT INTO "Entrenamiento" ("fecha", "hora_inicio", "hora_fin", "id_equipo", "id_instalacion") 

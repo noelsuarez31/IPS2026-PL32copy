@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS "Partido" (
 	"id_visitante"	INTEGER NOT NULL,
 	"id_instalacion" INTEGER NOT NULL,
 	
-	"dia_del_club" INTEGER NOT NULL DEFAULT 0 CHECK("dia_del_club" in (0,1)),
+	"dia_del_club" INTEGER NOT NULL DEFAULT 0 CHECK("dia_del_club" IN (0,1)),
 	"precio_abonado" REAL CHECK("precio_abonado" IS NULL OR "precio_abonado" >= 0),
 	
 	FOREIGN KEY("id_local") REFERENCES "Equipo"("id_equipo"),
@@ -175,11 +175,13 @@ CREATE TABLE IF NOT EXISTS "Partido" (
 );
 
 CREATE TABLE IF NOT EXISTS "PrecioSeccion" (
+	
 	"id_partido" INTEGER NOT NULL,
 	"seccion" TEXT NOT NULL,
 	"precio" REAL NOT NULL CHECK("precio" >= 0),
 	PRIMARY KEY("id_partido", "seccion"),
-	FOREIGN KEY ("id_partido") REFERENCES "Partido"("id_partido")
+	FOREIGN KEY("id_partido") REFERENCES "Partido"("id_partido")
+	
 );
 
 CREATE TABLE IF NOT EXISTS "Entrenamiento" (

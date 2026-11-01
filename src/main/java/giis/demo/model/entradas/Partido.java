@@ -15,6 +15,9 @@ public class Partido {
 	private int id_visitante;
 	private int id_instalacion;
 	
+	private boolean isClubDay;
+	private double precioAbonado;
+	
 	
 	//Atributos extras para facilitar la comprensión
 	
@@ -31,7 +34,7 @@ public class Partido {
 	 * @param nameVisitante
 	 */
 	public Partido(int id_partido, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin, int id_local, 
-			int id_visitante, String nameLocal, String nameVisitante, int id_instalacion) {
+			int id_visitante, String nameLocal, String nameVisitante, int id_instalacion, boolean isClubDay, double precioAbonado) {
 		
 		this.id_partido = id_partido;
 		this.fecha = fecha;
@@ -42,6 +45,9 @@ public class Partido {
 		this.nameLocal = nameLocal;
 		this.nameVisitante = nameVisitante;
 		this.id_instalacion = id_instalacion;
+		
+		this.isClubDay = isClubDay;
+		this.precioAbonado = precioAbonado;
 	}
 	
 	/**
@@ -116,6 +122,15 @@ public class Partido {
 	 */
 	public String getNameVisitante() {
 		return nameVisitante;
+	}
+
+	
+	public boolean isClubDay() {
+		return isClubDay;
+	}
+
+	public double getPrecioAbonado() {
+		return precioAbonado;
 	}
 
 	/**

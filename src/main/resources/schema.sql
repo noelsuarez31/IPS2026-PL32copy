@@ -26,6 +26,7 @@ drop table if exists Instalacion;
 drop table if exists Usuario;
 drop table if exists Abonado;
 drop table if exists Abono;
+drop table if exists PrecioSeccion;
 
 drop table if exists TareaMantenimientoJardinero;
 drop table if exists TareaMantenimiento;
@@ -163,10 +164,24 @@ CREATE TABLE IF NOT EXISTS "Partido" (
 	"id_local"	INTEGER NOT NULL,
 	"id_visitante"	INTEGER NOT NULL,
 	"id_instalacion" INTEGER NOT NULL,
+	
+	"dia_del_club" INTEGER NOT NULL DEFAULT 0 CHECK("dia_del_club" IN (0,1)),
+	"precio_abonado" REAL CHECK("precio_abonado" IS NULL OR "precio_abonado" >= 0),
+	 
 	FOREIGN KEY("id_local") REFERENCES "Equipo"("id_equipo"),
 	FOREIGN KEY("id_visitante") REFERENCES "Equipo"("id_equipo"),
 	FOREIGN KEY("id_instalacion") REFERENCES "Instalacion"("id_instalacion"),
 	CHECK("id_local" <> "id_visitante")
+);
+
+CREATE TABLE IF NOT EXISTS "PrecioSeccion" (
+	
+	"id_partido" INTEGER NOT NULL,
+	"seccion" TEXT NOT NULL,
+	"precio" REAL NOT NULL CHECK("precio" >= 0),
+	PRIMARY KEY("id_partido", "seccion"),
+	FOREIGN KEY("id_partido") REFERENCES "Partido"("id_partido")
+	
 );
 
 CREATE TABLE IF NOT EXISTS "Entrenamiento" (

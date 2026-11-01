@@ -5,12 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import giis.demo.model.empleado.EmpleadoDeportivo;
 import giis.demo.model.equipo.Equipo;
 
     public class EquipoJdbc {
+    	
         public final static String QUERY_GET_CATEGORY_ID = "SELECT id_categoria FROM CategoriaEquipo WHERE nombre=?";
         
         public final static String QUERY_CREATE_TEAM = "INSERT INTO Equipo (nombre, es_propio, tipo_equipo, id_categoria) VALUES (?,?,?,?)";
@@ -18,6 +20,9 @@ import giis.demo.model.equipo.Equipo;
         public final static String QUERY_SAVE_TEAM_MEMBERS = "UPDATE EmpleadoDeportivo SET id_equipo=? WHERE dni=?";
         
         public final static String QUERY_CHECK_MEMBER_TEAM = "SELECT id_equipo FROM EmpleadoDeportivo WHERE dni=?";
+        
+        public final static String QUERY_GET_LOCAL_TEAMS = "SELECT * FROM Equipo WHERE es_propio = 1 ORDER BY nombre";
+
         
         /**
          * Almacena un equipo en la BBDD. Saca el id_equipo de la BBDD (autoincremental).
@@ -138,4 +143,27 @@ import giis.demo.model.equipo.Equipo;
                 }
             }
         }
+        
+        public static List<Equipo> getEquiposPropios(Connection con) throws SQLException {
+        	
+        	List<Equipo> equipos = new ArrayList<Equipo>();
+        	
+            try(PreparedStatement pst = con.prepareStatement(QUERY_GET_LOCAL_TEAMS);
+            		ResultSet rs = pst.executeQuery()){
+               
+            	while(rs.next()) {
+            		
+            		Equipo eq = new Equipo(rs.getString("nombre"), 
+            				rs.getString("tipo_equipo"), null);
+            		
+            		eq.setIdEquipo(rs.getInt("id_equipo"));
+            		eq.setIsPropio(true);
+            		equipos.add(eq);
+            		
+            	}
+            }
+            
+            return equipos;
+        }
+        
 }

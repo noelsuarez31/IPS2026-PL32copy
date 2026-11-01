@@ -46,4 +46,11 @@ public class Equipo {
 	public int getIdEquipo() {
 		return this.id_equipo;
 	}
+
+	@Override
+	public String toString() {
+		return "Equipo [ " + nombre + ", " + categoriaEquipo + " ]";
+	}
+	
+	
 }

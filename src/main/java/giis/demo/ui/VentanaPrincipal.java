@@ -4,14 +4,13 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
 import giis.demo.model.contrataciones.GestorEmpleados;
 import giis.demo.model.entrevistas.CrearEntrevistaService;
@@ -23,6 +22,7 @@ import giis.demo.model.horarios.GestionHorarioSemanal;
 import giis.demo.model.horarios.GestionHorariosEspecificos;
 import giis.demo.model.horarios.GestionHorariosPeriodicos;
 import giis.demo.model.tienda.VentaMerchandising;
+import giis.demo.ui.abonos.VentanaAbono;
 import giis.demo.ui.contrataciones.VentanaAltaEmpleado;
 import giis.demo.ui.contrataciones.VentanaGestionEmpleados;
 import giis.demo.ui.entradas.VentanaVentaEntradas;
@@ -111,6 +111,7 @@ public class VentanaPrincipal extends JFrame {
 	private JMenuBar getMenuBar_1() {
 		if (menuBar == null) {
 			menuBar = new JMenuBar();
+			menuBar.add(getMnAbonado());
 			menuBar.add(getMnDirectorDeComunicaciones());
 			menuBar.add(getMnEmpleado());
 			menuBar.add(getMnEntrenador());

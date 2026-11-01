@@ -8,8 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.ZoneId;
+import java.util.Date;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -25,13 +25,15 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import com.toedter.calendar.JDateChooser;
+
 import giis.demo.exceptions.EmployeeException;
 import giis.demo.model.contrataciones.GestorEmpleados;
 import giis.demo.model.empleado.Posicion;
 
 public class VentanaAltaEmpleado extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	static final LocalDate FECHA_NACIMIENTO_MINIMA = LocalDate.of(1951, 1, 1);
 	private JPanel contentPane;
 	private JPanel pnNorte;
 	private JLabel lblTitulo;
@@ -44,7 +46,8 @@ public class VentanaAltaEmpleado extends JFrame {
 
 	// Componentes Datos Personales
 	private JLabel lbNombre, lbApellido, lbDni, lbTelefono, lbFechaNac;
-	private JTextField txNombre, txApellido, txDni, txTelefono, txFechaNac;
+	private JTextField txNombre, txApellido, txDni, txTelefono;
+	private JDateChooser dcFechaNac;
 
 	// Componentes Datos Profesionales
 	private JLabel lbSalario, lbTipo, lbPosicion;
@@ -69,7 +72,7 @@ public class VentanaAltaEmpleado extends JFrame {
 		contentPane.add(getPnNorte(), BorderLayout.NORTH);
 		contentPane.add(getPnCentro(), BorderLayout.CENTER);
 		contentPane.add(getPnSur(), BorderLayout.SOUTH);
-		
+
 		actualizarModeloPosicion();
 	}
 
@@ -111,8 +114,8 @@ public class VentanaAltaEmpleado extends JFrame {
 			txDni = new JTextField();
 			lbTelefono = new JLabel("Teléfono:");
 			txTelefono = new JTextField();
-			lbFechaNac = new JLabel("Fecha Nac. (dd/MM/yyyy):");
-			txFechaNac = new JTextField();
+			lbFechaNac = new JLabel("Fecha de nacimiento:");
+			dcFechaNac = crearSelectorFechaNacimiento();
 
 			pnDatosPersonales.add(lbNombre);
 			pnDatosPersonales.add(txNombre);
@@ -123,7 +126,7 @@ public class VentanaAltaEmpleado extends JFrame {
 			pnDatosPersonales.add(lbTelefono);
 			pnDatosPersonales.add(txTelefono);
 			pnDatosPersonales.add(lbFechaNac);
-			pnDatosPersonales.add(txFechaNac);
+			pnDatosPersonales.add(dcFechaNac);
 		}
 		return pnDatosPersonales;
 	}
@@ -266,9 +269,9 @@ public class VentanaAltaEmpleado extends JFrame {
 	 * Valida solo el formato de los campos. Las reglas de negocio (menores de edad,
 	 * dni/telefono duplicados...) las valida GestorEmpleados
 	 */
-	 private boolean validarFormulario() {
+	private boolean validarFormulario() {
 		if (txNombre.getText().isBlank() || txApellido.getText().isBlank() || txDni.getText().isBlank()
-				|| txTelefono.getText().isBlank() || txFechaNac.getText().isBlank() || txSalario.getText().isBlank()) {
+				|| txTelefono.getText().isBlank() || dcFechaNac.getDate() == null || txSalario.getText().isBlank()) {
 			mostrarError("Todos los campos son obligatorios");
 			return false;
 		}
@@ -282,15 +285,10 @@ public class VentanaAltaEmpleado extends JFrame {
 			return false;
 		}
 
-		// Validación de la fecha y que el año sea mayor a 1950
-		try {
-			LocalDate fechaNac = LocalDate.parse(txFechaNac.getText().trim(), FORMATO_FECHA);
-			if (fechaNac.getYear() <= 1950) {
-				mostrarError("El año de nacimiento debe ser mayor a 1950");
-				return false;
-			}
-		} catch (DateTimeParseException e) {
-			mostrarError("Formato de fecha incorrecto. Use dd/MM/yyyy");
+		// El calendario ya limita el rango, pero la fecha tambien se puede escribir a
+		// mano
+		if (!esFechaNacimientoValida(aLocalDate(dcFechaNac.getDate()))) {
+			mostrarError("La fecha de nacimiento debe ser posterior a 1950 y no puede ser futura");
 			return false;
 		}
 
@@ -305,14 +303,13 @@ public class VentanaAltaEmpleado extends JFrame {
 
 	private void crearYGuardarEmpleado() {
 		try {
-			LocalDate fechaNac = LocalDate.parse(txFechaNac.getText().trim(), FORMATO_FECHA);
+			LocalDate fechaNac = aLocalDate(dcFechaNac.getDate());
 			BigDecimal salario = new BigDecimal(txSalario.getText().trim());
 			boolean esDeportivo = getRbDeportivo().isSelected();
 			Posicion posicion = (Posicion) getCbPosicion().getSelectedItem();
 
 			gestor.registrarNuevoEmpleado(txDni.getText().trim(), txNombre.getText().trim(),
-					txApellido.getText().trim(), salario, fechaNac, txTelefono.getText().trim(), esDeportivo,
-					posicion);
+					txApellido.getText().trim(), salario, fechaNac, txTelefono.getText().trim(), esDeportivo, posicion);
 
 			JOptionPane.showMessageDialog(this, "Empleado registrado con éxito", "Éxito",
 					JOptionPane.INFORMATION_MESSAGE);
@@ -331,9 +328,35 @@ public class VentanaAltaEmpleado extends JFrame {
 		txApellido.setText("");
 		txDni.setText("");
 		txTelefono.setText("");
-		txFechaNac.setText("");
+		dcFechaNac.setDate(null);
 		txSalario.setText("");
 		getRbDeportivo().setSelected(true);
 		actualizarModeloPosicion();
+	}
+
+	// Utilidades de fecha compartidas con VentanaGestionEmpleados
+
+	/**
+	 * Selector de fecha (como el del historial de ventas) limitado a fechas de
+	 * nacimiento validas: desde 1951 hasta hoy
+	 */
+	static JDateChooser crearSelectorFechaNacimiento() {
+		JDateChooser selector = new JDateChooser();
+		selector.setDateFormatString("dd/MM/yyyy");
+		selector.setMinSelectableDate(aDate(FECHA_NACIMIENTO_MINIMA));
+		selector.setMaxSelectableDate(aDate(LocalDate.now()));
+		return selector;
+	}
+
+	static boolean esFechaNacimientoValida(LocalDate fecha) {
+		return fecha != null && !fecha.isBefore(FECHA_NACIMIENTO_MINIMA) && !fecha.isAfter(LocalDate.now());
+	}
+
+	static LocalDate aLocalDate(Date fecha) {
+		return fecha == null ? null : fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	}
+
+	static Date aDate(LocalDate fecha) {
+		return fecha == null ? null : Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 }

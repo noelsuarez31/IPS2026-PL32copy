@@ -7,9 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,21 +24,21 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
+import com.toedter.calendar.JDateChooser;
+
 import giis.demo.exceptions.EmployeeException;
 import giis.demo.model.contrataciones.GestorEmpleados;
 import giis.demo.model.empleado.BaseEmpleado;
 import giis.demo.model.empleado.EmpleadoDeportivo;
 import giis.demo.ui.VentanaPrincipal;
-import giis.demo.ui.contrataciones.VentanaAltaEmpleado;
 
 /**
- * Permite elegir un empleado existente, modificar sus datos personales y su salario
- * (no su puesto de trabajo) o eliminarlo del sistema
+ * Permite elegir un empleado existente, modificar sus datos personales y su
+ * salario (no su puesto de trabajo) o eliminarlo del sistema
  */
 public class VentanaGestionEmpleados extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 	private GestorEmpleados gestor;
 
@@ -54,7 +51,8 @@ public class VentanaGestionEmpleados extends JFrame {
 	private JTable tablaEmpleados;
 	private DefaultTableModel modeloEmpleados;
 
-	private JTextField txNombre, txApellido, txDni, txTelefono, txFechaNac, txSalario;
+	private JTextField txNombre, txApellido, txDni, txTelefono, txSalario;
+	private JDateChooser dcFechaNac;
 	private JLabel lbTipoValor, lbPosicionValor;
 	private JButton btGuardar, btEliminar;
 
@@ -199,7 +197,7 @@ public class VentanaGestionEmpleados extends JFrame {
 		txApellido = new JTextField();
 		txDni = new JTextField();
 		txTelefono = new JTextField();
-		txFechaNac = new JTextField();
+		dcFechaNac = VentanaAltaEmpleado.crearSelectorFechaNacimiento();
 
 		pn.add(new JLabel("Nombre:"));
 		pn.add(txNombre);
@@ -209,8 +207,8 @@ public class VentanaGestionEmpleados extends JFrame {
 		pn.add(txDni);
 		pn.add(new JLabel("Teléfono:"));
 		pn.add(txTelefono);
-		pn.add(new JLabel("Fecha Nac. (dd/MM/yyyy):"));
-		pn.add(txFechaNac);
+		pn.add(new JLabel("Fecha de nacimiento:"));
+		pn.add(dcFechaNac);
 		return pn;
 	}
 
@@ -261,7 +259,7 @@ public class VentanaGestionEmpleados extends JFrame {
 		txApellido.setText(emp.getApellido());
 		txDni.setText(emp.getDni());
 		txTelefono.setText(emp.getNumeroTelefono());
-		txFechaNac.setText(emp.getFechaNacimiento().format(FORMATO_FECHA));
+		dcFechaNac.setDate(VentanaAltaEmpleado.aDate(emp.getFechaNacimiento()));
 		txSalario.setText(emp.getSalario().toPlainString());
 		lbTipoValor.setText(textoTipo(emp));
 		lbPosicionValor.setText(VentanaAltaEmpleado.formatearPosicion(emp.getPosicion()));
@@ -269,10 +267,13 @@ public class VentanaGestionEmpleados extends JFrame {
 
 	private void limpiarFormulario() {
 		empleadoSeleccionado = null;
-		for (JTextField tx : new JTextField[] { txNombre, txApellido, txDni, txTelefono, txFechaNac, txSalario }) {
+		for (JTextField tx : new JTextField[] { txNombre, txApellido, txDni, txTelefono, txSalario }) {
 			if (tx != null) {
 				tx.setText("");
 			}
+		}
+		if (dcFechaNac != null) {
+			dcFechaNac.setDate(null);
 		}
 		if (lbTipoValor != null) {
 			lbTipoValor.setText("-");
@@ -282,10 +283,13 @@ public class VentanaGestionEmpleados extends JFrame {
 	}
 
 	private void habilitarFormulario(boolean habilitar) {
-		for (JTextField tx : new JTextField[] { txNombre, txApellido, txDni, txTelefono, txFechaNac, txSalario }) {
+		for (JTextField tx : new JTextField[] { txNombre, txApellido, txDni, txTelefono, txSalario }) {
 			if (tx != null) {
 				tx.setEnabled(habilitar);
 			}
+		}
+		if (dcFechaNac != null) {
+			dcFechaNac.setEnabled(habilitar);
 		}
 		if (btGuardar != null) {
 			btGuardar.setEnabled(habilitar);
@@ -302,7 +306,7 @@ public class VentanaGestionEmpleados extends JFrame {
 		try {
 			gestor.modificarEmpleado(empleadoSeleccionado, txDni.getText().trim(), txNombre.getText().trim(),
 					txApellido.getText().trim(), new BigDecimal(txSalario.getText().trim()),
-					LocalDate.parse(txFechaNac.getText().trim(), FORMATO_FECHA), txTelefono.getText().trim());
+					VentanaAltaEmpleado.aLocalDate(dcFechaNac.getDate()), txTelefono.getText().trim());
 
 			JOptionPane.showMessageDialog(this, "Empleado modificado con éxito", "Éxito",
 					JOptionPane.INFORMATION_MESSAGE);
@@ -316,9 +320,10 @@ public class VentanaGestionEmpleados extends JFrame {
 		if (empleadoSeleccionado == null) {
 			return;
 		}
-		String mensaje = String.format("¿Seguro que desea eliminar a %s %s (%s)?%n"
-				+ "También se eliminarán sus horarios, franjas y entrevistas.", empleadoSeleccionado.getNombre(),
-				empleadoSeleccionado.getApellido(), empleadoSeleccionado.getDni());
+		String mensaje = String.format(
+				"¿Seguro que desea eliminar a %s %s (%s)?%n"
+						+ "También se eliminarán sus horarios, franjas y entrevistas.",
+				empleadoSeleccionado.getNombre(), empleadoSeleccionado.getApellido(), empleadoSeleccionado.getDni());
 		if (gestor.perteneceAEquipo(empleadoSeleccionado)) {
 			mensaje += "\n\nAtención: este empleado pertenece a un equipo y dejará de formar parte de él.";
 		}
@@ -354,11 +359,12 @@ public class VentanaGestionEmpleados extends JFrame {
 	}
 
 	/**
-	 * Valida solo el formato de los campos. Las reglas de negocio las valida GestorEmpleados
+	 * Valida solo el formato de los campos. Las reglas de negocio las valida
+	 * GestorEmpleados
 	 */
-	 private boolean validarFormulario() {
+	private boolean validarFormulario() {
 		if (txNombre.getText().isBlank() || txApellido.getText().isBlank() || txDni.getText().isBlank()
-				|| txTelefono.getText().isBlank() || txFechaNac.getText().isBlank() || txSalario.getText().isBlank()) {
+				|| txTelefono.getText().isBlank() || dcFechaNac.getDate() == null || txSalario.getText().isBlank()) {
 			mostrarError("Todos los campos son obligatorios");
 			return false;
 		}
@@ -370,25 +376,20 @@ public class VentanaGestionEmpleados extends JFrame {
 			mostrarError("El salario debe ser un número mayor que cero");
 			return false;
 		}
-		
-		// Validación de la fecha y año mayor a 1950
-		try {
-			LocalDate fechaNac = LocalDate.parse(txFechaNac.getText().trim(), FORMATO_FECHA);
-			if (fechaNac.getYear() <= 1950) {
-				mostrarError("El año de nacimiento debe ser mayor a 1950");
-				return false;
-			}
-		} catch (DateTimeParseException e) {
-			mostrarError("Formato de fecha incorrecto. Use dd/MM/yyyy");
+
+		// El calendario ya limita el rango, pero la fecha tambien se puede escribir a
+		// mano
+		if (!VentanaAltaEmpleado.esFechaNacimientoValida(VentanaAltaEmpleado.aLocalDate(dcFechaNac.getDate()))) {
+			mostrarError("La fecha de nacimiento debe ser posterior a 1950 y no puede ser futura");
 			return false;
 		}
-		
+
 		// Validación de teléfono de 9 dígitos
 		if (!txTelefono.getText().trim().matches("\\d{9}")) {
 			mostrarError("El teléfono debe ser un número de 9 dígitos");
 			return false;
 		}
-		
+
 		return true;
 	}
 

@@ -24,6 +24,8 @@ drop table if exists Producto;
 drop table if exists Reserva;
 drop table if exists Instalacion;
 drop table if exists Usuario;
+drop table if exists Abonado;
+drop table if exists Abono;
 
 CREATE TABLE IF NOT EXISTS "butaca" (
 	"id_butaca"	INTEGER,
@@ -200,4 +202,32 @@ CREATE TABLE IF NOT EXISTS "Usuario" (
 CREATE TABLE IF NOT EXISTS "Instalacion" (
 	"id_instalacion" INTEGER PRIMARY KEY,
 	"nombre" TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS "Abonado" (
+	"id_abonado" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"dni" TEXT NOT NULL UNIQUE,
+	"nombre" TEXT NOT NULL,
+	"apellidos" TEXT NOT NULL,
+	"fecha_nacimiento" TEXT NOT NULL,
+	"email" TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "Abono" (
+	"id_abono" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"id_venta" INTEGER NOT NULL,
+	"id_abonado" INTEGER NOT NULL,
+	"id_equipo" INTEGER NOT NULL,
+	"id_butaca" INTEGER NOT NULL,
+	"fecha_inicio" TEXT NOT NULL,
+	"fecha_fin" TEXT NOT NULL,
+	"fecha_registro" TEXT NOT NULL,
+	"categoria" TEXT NOT NULL CHECK("categoria" IN ('INFANTIL', 'SUB_26', 'ADULTO', 'JUBILADO')),
+	"precio" REAL NOT NULL,
+	UNIQUE("id_abonado", "fecha_inicio"),
+	UNIQUE("id_butaca", "fecha_inicio"),
+	FOREIGN KEY("id_venta") REFERENCES "Venta"("id_venta"),
+	FOREIGN KEY("id_abonado") REFERENCES "Abonado"("id_abonado"),
+	FOREIGN KEY("id_equipo") REFERENCES "Equipo"("id_equipo"),
+	FOREIGN KEY("id_butaca") REFERENCES "Butaca"("id_butaca")
 );

@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.Random;
 
 import giis.demo.jdbc.JDBC;
+import giis.demo.model.abonos.Venta;
 import giis.demo.model.entradas.enumerados.TipoSeccion;
 import giis.demo.model.entradas.enumerados.TipoTribuna;
 import giis.demo.exceptions.SinDisponibilidadException;
 
-public class VentaDeEntradas {
+public class VentaDeEntradas extends Venta{
 
 	public static final int MAX_ENTRADAS = 15;
 	public static final int PRICE_ENTRADAS = 30;
@@ -164,26 +165,6 @@ public class VentaDeEntradas {
 
 		return anterior.getFila() == actual.getFila() && actual.getAsiento() == anterior.getAsiento() + 1;
 
-	}
-
-	/**
-	 * Enums de tribuna
-	 * 
-	 * @return los distintos valores que puede tomar la tribuna
-	 */
-	public TipoTribuna[] getTipoTribuna() {
-
-		return TipoTribuna.values();
-	}
-
-	/**
-	 * Enums de seccion
-	 * 
-	 * @return los distintos valores que puede tomar la seccion
-	 */
-	public TipoSeccion[] getTipoSeccion() {
-
-		return TipoSeccion.values();
 	}
 
 	/**

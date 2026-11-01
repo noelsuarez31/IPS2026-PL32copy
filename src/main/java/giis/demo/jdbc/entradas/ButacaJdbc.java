@@ -17,7 +17,10 @@ public class ButacaJdbc {
 	
 	private static final String QUERY_FREE_BUTACAS = "SELECT id_butaca, fila, asiento FROM butaca "
 			+ "WHERE tribuna = ? AND seccion = ? "
-			+ "AND id_butaca NOT IN (SELECT id_butaca FROM entrada WHERE id_partido = ?) " + "ORDER BY fila, asiento";
+			+ "AND id_butaca NOT IN (SELECT id_butaca FROM entrada WHERE id_partido = ?) "
+			+ "AND id_butaca NOT IN (SELECT a.id_butaca FROM Abono a, Partido p WHERE p.id_partido = ? "
+			+ "AND p.fecha>= a.fecha_inicio AND p.fecha<=a.fecha_fin AND a.id_equipo = p.id_local) "
+			+ "ORDER BY fila, asiento";
 
 	private static final String QUERY_ALL_BUTACAS = "SELECT id_butaca, fila, asiento FROM butaca "
 			+ "WHERE tribuna = ? AND seccion = ? "
@@ -40,6 +43,7 @@ public class ButacaJdbc {
 			ps.setString(1, String.valueOf(tribuna));
 			ps.setString(2, String.valueOf(seccion));
 			ps.setInt(3, idPartido);
+			ps.setInt(4, idPartido);
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -73,7 +77,6 @@ public class ButacaJdbc {
 
 			ps.setString(1, String.valueOf(tribuna));
 			ps.setString(2, String.valueOf(seccion));
-			ps.setInt(3, idPartido);
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {

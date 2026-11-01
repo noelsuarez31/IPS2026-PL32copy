@@ -32,6 +32,19 @@ public class VentaMerchandising {
 	public List<Producto> getCatalogo() {
 		return catalogo;
 	}
+	
+	/**
+	 * Devuelve los productos del catalogo que cumplen el filtro
+	 */
+	public List<Producto> getCatalogo(FiltroProducto filtro) {
+		List<Producto> filtrados = new ArrayList<>();
+		for (Producto p : catalogo) {
+			if (filtro.incluye(p)) {
+				filtrados.add(p);
+			}
+		}
+		return filtrados;
+	}
 
 	public Cesta getCesta() {
 		return cesta;

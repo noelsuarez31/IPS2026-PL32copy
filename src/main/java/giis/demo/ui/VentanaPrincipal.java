@@ -70,6 +70,8 @@ public class VentanaPrincipal extends JFrame {
 	private JMenuItem mntmCrearFranjas;
 	private JMenu mnDirectorDeComunicaciones;
 	private JMenuItem mntmAsignarEntrevistas;
+	private JMenu mnAbonado;
+	private JMenuItem mntmComprarAbono;
 	private JMenuItem mntmRegistrarEntrenamientos;
 
 	/**

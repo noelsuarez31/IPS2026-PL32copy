@@ -473,6 +473,37 @@ public class VentanaPrincipal extends JFrame {
 	public GestionHorarioSemanal getGestionHorarioSemanal() {
 		return this.ghs;
 	}
+	
+	private JMenu getMnAbonado() {
+		if (mnAbonado == null) {
+			mnAbonado = new JMenu("Abonado");
+			mnAbonado.setMnemonic('B');
+			mnAbonado.add(getMntmComprarAbono());
+		}
+		return mnAbonado;
+	}
+	private JMenuItem getMntmComprarAbono() {
+		if (mntmComprarAbono == null) {
+			mntmComprarAbono = new JMenuItem("Comprar abono");
+			mntmComprarAbono.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					
+					abrirVentaAbono();
+					
+				}
+			});
+		}
+		return mntmComprarAbono;
+	}
+	
+	private void abrirVentaAbono() {
+		
+		
+		VentanaAbono va = new VentanaAbono(this);
+		this.setVisible(false);
+		va.setVisible(true);
+	}
+	
 	private JMenuItem getMntmRegistrarEntrenamientos() {
 		if (mntmRegistrarEntrenamientos == null) {
 			mntmRegistrarEntrenamientos = new JMenuItem("Registrar entrenamiento");

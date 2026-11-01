@@ -34,7 +34,8 @@ public class BaseEmpleadoJdbc {
 			"UPDATE EmpleadoNoDeportivo SET dni = ? WHERE dni = ?",
 			"UPDATE HorarioPeriodico SET dni_empleado = ? WHERE dni_empleado = ?",
 			"UPDATE HorarioEspecifico SET dni_empleado = ? WHERE dni_empleado = ?",
-			"UPDATE FranjaHoraria SET dni_jugador = ? WHERE dni_jugador = ?" };
+			"UPDATE FranjaHoraria SET dni_jugador = ? WHERE dni_jugador = ?" ,
+			"UPDATE TareaMantenimientoJardinero SET dni_jardinero = ? WHERE dni_jardinero = ?"};
 	private static final String[] QUERIES_DELETE_EMPLEADO = {
 			"DELETE FROM Entrevista WHERE id_franja IN (SELECT id_franja FROM FranjaHoraria WHERE dni_jugador = ?)",
 			"DELETE FROM FranjaHoraria WHERE dni_jugador = ?",
@@ -42,7 +43,8 @@ public class BaseEmpleadoJdbc {
 			"DELETE FROM HorarioEspecifico WHERE dni_empleado = ?",
 			"DELETE FROM EmpleadoDeportivo WHERE dni = ?",
 			"DELETE FROM EmpleadoNoDeportivo WHERE dni = ?",
-			"DELETE FROM BaseEmpleado WHERE dni = ?" };
+			"DELETE FROM BaseEmpleado WHERE dni = ?" ,
+			"DELETE FROM TareaMantenimientoJardinero WHERE dni_jardinero = ?"};
 
 	/**
 	 * Inserta los datos comunes de un empleado (deportivo o no deportivo)

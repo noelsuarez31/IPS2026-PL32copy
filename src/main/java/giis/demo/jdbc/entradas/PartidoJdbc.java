@@ -19,6 +19,7 @@ public class PartidoJdbc {
 			+ "Equipo eq2 WHERE p.id_local = eq1.id_equipo AND p.id_visitante = eq2.id_equipo "
 			+ "AND p.fecha >= ? ORDER BY p.fecha";
 
+	
 	/**
 	 * Obtiene todos los partidos disponibles
 	 * 
